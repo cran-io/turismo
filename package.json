@@ -1,0 +1,25 @@
+{
+  "name": "turismo",
+  "version": "1.0.0",
+  "description": "A NodeJS app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cran-io/turismo.git"
+  },
+  "author": "mmaquiel",
+  "license": "CC-BY-4.0",
+  "bugs": {
+    "url": "https://github.com/cran-io/turismo/issues"
+  },
+  "homepage": "https://github.com/cran-io/turismo#readme",
+  "dependencies": {
+    "body-parser": "^1.13.1",
+    "express": "^4.13.0",
+    "mongoose": "^4.0.6",
+    "validator": "^3.40.1"
+  }
+}

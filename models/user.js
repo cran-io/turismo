@@ -1,8 +1,10 @@
 var mongoose = require('mongoose'),
     validator = require('validator');
+var Sequence = require('./sequence');
 var Schema = mongoose.Schema;
 
-var userSchema = new Schema({
+var UserSchema = new Schema({
+  userId: Number,
   name: {
     type: String,
     required: true
@@ -16,15 +18,30 @@ var userSchema = new Schema({
     validate: [ validator.isEmail, 'Invalid Email' ]
   },
   preferenceZone: {
-    type: String,
+    type: Number,
     required: true
   },
   qrCode: {
     type: String,
     required: true
-  }
+  },
+  createdAt: Date
 });
 
-var User = mongoose.model('User', userSchema);
+UserSchema.pre('save', function(next){
+  var thisDoc = this;
+
+  Sequence.findByIdAndUpdate({_id: 'user.id'}, {$inc: { seq: 1} }, function(error, sequence)   {
+        if(error) return next(error);
+
+        thisDoc.createdAt = new Date();
+        thisDoc.userId = sequence.seq;
+        next();
+  });
+  // next() must be call from the callback!
+  //next();
+});
+
+var User = mongoose.model('User', UserSchema);
 
 module.exports = User;

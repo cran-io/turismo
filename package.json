@@ -17,9 +17,13 @@
   },
   "homepage": "https://github.com/cran-io/turismo#readme",
   "dependencies": {
+    "async": "^1.3.0",
     "body-parser": "^1.13.1",
     "express": "^4.13.0",
+    "lodash": "^3.10.0",
     "mongoose": "^4.0.6",
-    "validator": "^3.40.1"
+    "node-osc": "^1.1.0",
+    "validator": "^3.40.1",
+    "xml2js": "^0.4.9"
   }
 }

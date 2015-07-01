@@ -27,8 +27,13 @@ app.post('/signup', function(req, res) {
   newUser.save(function(err) {
     if(err){
       res.status(500);
-      res.send(JSON.stringify(err.errors));
+      if(err.errors.email){
+        res.send(err.errors.email.message);
+      }
     }
+
+    res.status(200);
+    res.send();
   });
 });
 
@@ -53,7 +58,7 @@ app.post('/checkin', function(req, res) {
         if(err) callback(err, null);
 
         var installations = installationsFrom(result, checkin.qrReaderId);
-        
+
         installations.forEach(function(anInstallation) {
           var ipPortArray = anInstallation.split(":");
           var client = new osc.Client(ipPortArray[0], parseInt(ipPortArray[1]));

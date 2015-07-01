@@ -25,21 +25,20 @@ var UserSchema = new Schema({
     type: String,
     required: true
   },
-  createdAt: Date
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 UserSchema.pre('save', function(next){
   var thisDoc = this;
-
   Sequence.findByIdAndUpdate({_id: 'user.id'}, {$inc: { seq: 1} }, function(error, sequence)   {
         if(error) return next(error);
 
-        thisDoc.createdAt = new Date();
         thisDoc.userId = sequence.seq;
         next();
   });
-  // next() must be call from the callback!
-  //next();
 });
 
 var User = mongoose.model('User', UserSchema);

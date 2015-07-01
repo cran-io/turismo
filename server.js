@@ -49,18 +49,20 @@ app.post('/checkin', function(req, res) {
       });
     },
     function(user, callback) {
-      console.log(JSON.stringify(user));
       utils.parseXmlFile(MAPPING_FILE_DIR, function(err, result) {
         if(err) callback(err, null);
 
         var installations = installationsFrom(result, checkin.qrReaderId);
-
+        
         installations.forEach(function(anInstallation) {
           var ipPortArray = anInstallation.split(":");
           var client = new osc.Client(ipPortArray[0], parseInt(ipPortArray[1]));
 
-          client.send('/QRTag', 200, function () {
-            client.kill();
+          client.send('/QRTag', parseInt(checkin.qrReaderId), user.userId, user.name, user.email, user.age, user.preferenceRegion,
+            function () {
+              client.kill();
+              res.status(200);
+              res.send();
           });
         });
 
@@ -70,11 +72,12 @@ app.post('/checkin', function(req, res) {
 });
 
 function installationsFrom(result, qrReaderId) {
-  return _.chain(result.qrReaders.qrReader)
-  .select(function(element) {
-    return element.$.id == qrReaderId;
-  }).first()
-  .value().installationAddress;
+  return _.chain(result.qrReaders.qrReader).
+    select(function(element) {
+      return element.$.id == qrReaderId;
+    }).
+    first().
+    value().installationAddress;
 }
 
 app.listen(3000);

@@ -17,7 +17,7 @@ var UserSchema = new Schema({
     type: String,
     validate: [ validator.isEmail, 'Invalid Email' ]
   },
-  preferenceZone: {
+  preferenceRegion: {
     type: Number,
     required: true
   },

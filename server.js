@@ -48,31 +48,32 @@ app.post('/checkin', function(req, res) {
 
   User.findByQrCode(checkin.qrCode).
     then(function(user) {
-      mappingPromise.then(function(mapping) {
-        var installations = installationsFrom(mapping, checkin.qrReaderId);
+      mappingPromise.
+        then(function(mapping) {
+          var installations = installationsFrom(mapping, checkin.qrReaderId);
 
-        installations.forEach(function(anInstallation) {
-          var ipPortArray = anInstallation.split(":");
-          var client = new osc.Client(ipPortArray[0], parseInt(ipPortArray[1]));
+          installations.forEach(function(anInstallation) {
+            var ipPortArray = anInstallation.split(":");
+            var client = new osc.Client(ipPortArray[0], parseInt(ipPortArray[1]));
 
-          client.send('/QRTag', parseInt(checkin.qrReaderId), user.userId, user.name, user.email, user.age, user.preferenceRegion,
+            client.send('/QRTag', parseInt(checkin.qrReaderId), user.userId, user.name, user.email, user.age, user.preferenceRegion,
             function () {
               client.kill();
               res.status(200);
               res.send();
+            });
           });
         });
-      });
     });
 });
 
 function installationsFrom(result, qrReaderId) {
   return _.chain(result.qrReaders.qrReader).
-    select(function(element) {
-      return element.$.id == qrReaderId;
-    }).
-    first().
-    value().installationAddress;
+  select(function(element) {
+    return element.$.id == qrReaderId;
+  }).
+  first().
+  value().installationAddress;
 }
 
 app.listen(3000);

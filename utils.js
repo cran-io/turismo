@@ -1,5 +1,4 @@
 var xmlParser = require('xml2js').Parser();
-var processors = require('xml2js').processors;
 var Q = require('q');
 var fs = require('fs');
 
@@ -14,7 +13,7 @@ module.exports = {
         deferred.resolve(result);
       });
     });
-    
+
     return deferred.promise;
   }
 }

@@ -4,7 +4,7 @@ var bodyParser = require('body-parser');
 var utils = require('./utils');
 var osc = require('node-osc');
 var _ = require('lodash');
-var async = require('async');
+var Q = require('q');
 // Models
 var User = require('./models/user');
 
@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 var db = mongoose.connect('mongodb://localhost/sensorium');
 var MAPPING_FILE_DIR = __dirname + '/config/reader-installation-mapping.xml';
 
+var mappingPromise = utils.parseXmlFile(MAPPING_FILE_DIR);
 /**
 * Signup form:
 *   - Name
@@ -45,19 +46,10 @@ app.post('/signup', function(req, res) {
 app.post('/checkin', function(req, res) {
   var checkin = req.body;
 
-  async.waterfall([
-    function(callback) {
-      User.findOne({ 'qrCode': checkin.qrCode }).sort({ createdAt: -1 }).
-      exec(function(err, user) {
-        if(err) callback(err, null);
-        callback(null, user);
-      });
-    },
-    function(user, callback) {
-      utils.parseXmlFile(MAPPING_FILE_DIR, function(err, result) {
-        if(err) callback(err, null);
-
-        var installations = installationsFrom(result, checkin.qrReaderId);
+  User.findByQrCode(checkin.qrCode).
+    then(function(user) {
+      mappingPromise.then(function(mapping) {
+        var installations = installationsFrom(mapping, checkin.qrReaderId);
 
         installations.forEach(function(anInstallation) {
           var ipPortArray = anInstallation.split(":");
@@ -70,10 +62,8 @@ app.post('/checkin', function(req, res) {
               res.send();
           });
         });
-
       });
-    }
-  ]);
+    });
 });
 
 function installationsFrom(result, qrReaderId) {

@@ -1,6 +1,7 @@
 var mongoose = require('mongoose'),
     validator = require('validator');
 var Sequence = require('./sequence');
+var Q = require('q');
 var Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
@@ -31,6 +32,24 @@ var UserSchema = new Schema({
   }
 });
 
+/*
+* Static model methods
+*/
+UserSchema.statics.findByQrCode = function findByQrCode(qrCode) {
+  var deferred = Q.defer();
+
+  User.findOne({ 'qrCode': qrCode }).sort({ createdAt: -1 }).
+  exec(function(err, user) {
+    if(err) deferred.reject(err);
+    deferred.resolve(user);
+  });
+
+  return deferred.promise;
+}
+
+/*
+* Hooks
+*/
 UserSchema.pre('save', function(next){
   var thisDoc = this;
   Sequence.findByIdAndUpdate({_id: 'user.id'}, {$inc: { seq: 1} }, function(error, sequence)   {

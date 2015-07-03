@@ -2,10 +2,11 @@ var mongoose = require('mongoose');
 var utils = require('./utils');
 var osc = require('node-osc');
 var _ = require('lodash');
+var path = require('path');
 // Models
 var User = require('./models/user');
 
-var MAPPING_FILE_DIR = __dirname + '/config/reader-installation-mapping.xml';
+var MAPPING_FILE_DIR = path.join(__dirname, '../', 'config/reader-installation-mapping.xml');
 var mappingPromise = utils.parseXmlFile(MAPPING_FILE_DIR);
 
 module.exports = function(app) {
@@ -37,6 +38,8 @@ module.exports = function(app) {
 
     User.findByQrCode(checkin.qrCode).
       then(function(user) {
+        if(!user) res.status(404).send('User not found');
+        
         mappingPromise.
           then(function(mapping) {
             var installations = installationsFrom(mapping, checkin.qrReaderId);
@@ -53,8 +56,12 @@ module.exports = function(app) {
               });
             });
           });
+      }).
+      catch(function(err) {
+        if(err) next(err);
       });
   });
+
 
   function installationsFrom(result, qrReaderId) {
     return _.chain(result.qrReaders.qrReader).

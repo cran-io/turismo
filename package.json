@@ -4,9 +4,9 @@
   "description": "A NodeJS app",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "debug": "node-inspector & nodemon --debug server.js",
-    "debug-only": "nodemon --debug server.js"
+    "start": "node app/server.js",
+    "debug": "node-inspector & nodemon --debug app/server.js",
+    "debug-only": "nodemon --debug app/server.js"
   },
   "repository": {
     "type": "git",

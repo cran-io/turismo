@@ -39,7 +39,7 @@ module.exports = function(app) {
     User.findByQrCode(checkin.qrCode).
       then(function(user) {
         if(!user) res.status(404).send('User not found');
-        
+
         mappingPromise.
           then(function(mapping) {
             var installations = installationsFrom(mapping, checkin.qrReaderId);
@@ -58,7 +58,7 @@ module.exports = function(app) {
           });
       }).
       catch(function(err) {
-        if(err) next(err);
+        next(err);
       });
   });
 

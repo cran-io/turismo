@@ -4,7 +4,7 @@ var osc = require('node-osc');
 var _ = require('lodash');
 var path = require('path');
 // Models
-var User = require('./models/user');
+var Visitor = require('./models/visitor');
 
 var MAPPING_FILE_DIR = path.join(__dirname, '../', 'config/reader-installation-mapping.xml');
 var mappingPromise = utils.parseXmlFile(MAPPING_FILE_DIR);
@@ -19,8 +19,8 @@ module.exports = function(app) {
   *  - QR Code
   **/
   app.post('/signup', function(req, res, next) {
-    var newUser = new User(req.body);
-    newUser.save(function(err) {
+    var newVisitor = new Visitor(req.body);
+    newVisitor.save(function(err) {
       if(err) next(err);
 
       res.status(200);
@@ -36,9 +36,9 @@ module.exports = function(app) {
   app.post('/checkin', function(req, res) {
     var checkin = req.body;
 
-    User.findByQrCode(checkin.qrCode).
-      then(function(user) {
-        if(!user) res.status(404).send('User not found');
+    Visitor.findByQrCode(checkin.qrCode).
+      then(function(visitor) {
+        if(!visitor) res.status(404).send('Visitor not found');
 
         mappingPromise.
           then(function(mapping) {
@@ -48,7 +48,7 @@ module.exports = function(app) {
               var ipPortArray = anInstallation.split(":");
               var client = new osc.Client(ipPortArray[0], parseInt(ipPortArray[1]));
 
-              client.send('/QRTag', parseInt(checkin.qrReaderId), user.userId, user.name, user.email, user.age, user.preferenceRegion,
+              client.send('/QRTag', parseInt(checkin.qrReaderId), visitor.visitorId, visitor.name, visitor.email, visitor.age, visitor.preferenceRegion,
               function () {
                 client.kill();
                 res.status(200);

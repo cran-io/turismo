@@ -4,8 +4,8 @@ var Sequence = require('./sequence');
 var Q = require('q');
 var Schema = mongoose.Schema;
 
-var UserSchema = new Schema({
-  userId: Number,
+var VisitorSchema = new Schema({
+  visitorId: Number,
   name: {
     type: String,
     required: true
@@ -35,13 +35,13 @@ var UserSchema = new Schema({
 /*
 * Static model methods
 */
-UserSchema.statics.findByQrCode = function findByQrCode(qrCode) {
+VisitorSchema.statics.findByQrCode = function findByQrCode(qrCode) {
   var deferred = Q.defer();
 
-  User.findOne({ 'qrCode': qrCode }).sort({ createdAt: -1 }).
-  exec(function(err, user) {
+  Visitor.findOne({ 'qrCode': qrCode }).sort({ createdAt: -1 }).
+  exec(function(err, visitor) {
     if(err) deferred.reject(err);
-    deferred.resolve(user);
+    deferred.resolve(visitor);
   });
 
   return deferred.promise;
@@ -50,16 +50,16 @@ UserSchema.statics.findByQrCode = function findByQrCode(qrCode) {
 /*
 * Hooks
 */
-UserSchema.pre('save', function(next){
+VisitorSchema.pre('save', function(next){
   var thisDoc = this;
-  Sequence.findByIdAndUpdate({_id: 'user.id'}, {$inc: { seq: 1} }, function(error, sequence)   {
+  Sequence.findByIdAndUpdate({_id: 'visitor.id'}, {$inc: { seq: 1} }, function(error, sequence)   {
         if(error) return next(error);
 
-        thisDoc.userId = sequence.seq;
+        thisDoc.visitorId = sequence.seq;
         next();
   });
 });
 
-var User = mongoose.model('User', UserSchema);
+var Visitor = mongoose.model('Visitor', VisitorSchema);
 
-module.exports = User;
+module.exports = Visitor;

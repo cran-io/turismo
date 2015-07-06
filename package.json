@@ -28,6 +28,7 @@
     "node-osc": "^1.1.0",
     "nodemailer": "^1.4.0",
     "q": "^1.4.1",
+    "supertest": "^1.0.1",
     "validator": "^3.40.1",
     "xml2js": "^0.4.9"
   },

@@ -8,5 +8,5 @@ module.exports = function(port) {
         console.log(rinfo)
   });
 
-  console.log("OSC Server started");
+  console.log("OSC Server listening at port " + port);
 };

@@ -1,6 +1,8 @@
 var xmlParser = require('xml2js').Parser();
 var Q = require('q');
 var fs = require('fs');
+var path = require('path');
+var env = require(path.join(__dirname, '../', 'config/env.json'));
 
 module.exports = {
   parseXmlFile: function(dirName) {
@@ -15,5 +17,10 @@ module.exports = {
     });
 
     return deferred.promise;
+  },
+  
+  config: function() {
+    var node_env = process.env.NODE_ENV || 'development';
+    return env[node_env];
   }
 }

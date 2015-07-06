@@ -10,6 +10,8 @@ var db = mongoose.connect('mongodb://localhost/sensorium');
 // routes import
 require('./routes')(app);
 
+// Start OSC server
+require('./osc-server')(9001);
 /*
 * Middleware
 */

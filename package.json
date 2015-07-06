@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node app/server.js",
+    "test": "mocha",
     "debug": "node-inspector & nodemon --debug app/server.js",
     "debug-only": "nodemon --debug app/server.js"
   },
@@ -25,11 +26,14 @@
     "lodash": "^3.10.0",
     "mongoose": "^4.0.6",
     "node-osc": "^1.1.0",
+    "nodemailer": "^1.4.0",
     "q": "^1.4.1",
     "validator": "^3.40.1",
     "xml2js": "^0.4.9"
   },
   "devDependencies": {
+    "mocha": "^2.2.5",
+    "expect.js": "^0.3.1",
     "nodemon": "^1.3.7",
     "node-inspector": "^0.11.0"
   }

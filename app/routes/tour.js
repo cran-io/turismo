@@ -1,6 +1,6 @@
 var express = require('express');
 var path = require('path');
-var Visitor = require(path.join(__dirname, '../', 'models/visitor'));
+var Visitor = require('../../app/models/visitor');
 
 module.exports = function(app) {
   var router  = express.Router();

@@ -8,10 +8,11 @@ app.use(bodyParser.json());
 
 var db = mongoose.connect(config.db);
 
-// routes import
+// Initialize Routes
 require('./routes')(app);
 // Start OSC server
 require('./osc-server')(config.osc.port);
+
 /*
 * Middleware
 */

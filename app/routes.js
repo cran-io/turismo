@@ -3,13 +3,35 @@ var utils = require('./utils');
 var osc = require('node-osc');
 var _ = require('lodash');
 var path = require('path');
+
 // Models
 var Visitor = require('./models/visitor');
+var Sequence = require('./models/sequence');
 
 var MAPPING_FILE_DIR = path.join(__dirname, '../', 'config/reader-installation-mapping.xml');
 var mappingPromise = utils.parseXmlFile(MAPPING_FILE_DIR);
 
 module.exports = function(app) {
+
+  /**
+  * POST /start: assigns a groupId to the previous registered visitors.
+  */
+  app.post("/start", function(req, res, next) {
+    Visitor.findUnassigned().
+      then(function(unassignedVisitors) {
+
+        Sequence.next("group.id")
+          .then(function(id) {
+            unassignedVisitors.forEach(function(visitor) {
+              visitor.groupId = id;
+              visitor.save();
+            });
+
+            res.status(200).send({groupId: id});
+          });
+
+      });
+  });
   /**
   * Signup form:
   *   - Name

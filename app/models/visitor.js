@@ -6,6 +6,7 @@ var Schema = mongoose.Schema;
 
 var VisitorSchema = new Schema({
   visitorId: Number,
+  groupId: Number,
   name: {
     type: String,
     required: true
@@ -47,16 +48,27 @@ VisitorSchema.statics.findByQrCode = function findByQrCode(qrCode) {
   return deferred.promise;
 }
 
+VisitorSchema.statics.findUnassigned = function() {
+  var deferred = Q.defer();
+
+  this.find({'groupId': null}, function(err, visitors) {
+    if(err) deferred.reject(err);
+    deferred.resolve(visitors);
+  });
+
+  return deferred.promise;
+}
+
 /*
 * Hooks
 */
 VisitorSchema.pre('save', function(next){
   var thisDoc = this;
   Sequence.findByIdAndUpdate({_id: 'visitor.id'}, {$inc: { seq: 1} }, function(error, sequence)   {
-        if(error) return next(error);
+    if(error) return next(error);
 
-        thisDoc.visitorId = sequence.seq;
-        next();
+    thisDoc.visitorId = sequence.seq;
+    next();
   });
 });
 

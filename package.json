@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node app/server.js",
-    "test": "mocha",
+    "test": "NODE_ENV=development mocha",
     "debug": "node-inspector & nodemon --debug app/server.js",
     "debug-only": "nodemon --debug app/server.js"
   },

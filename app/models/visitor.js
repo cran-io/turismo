@@ -59,6 +59,25 @@ VisitorSchema.statics.findUnassigned = function() {
   return deferred.promise;
 }
 
+VisitorSchema.statics.assignGroup = function() {
+  var deferred = Q.defer();
+
+  this.findUnassigned().
+    then(function(unassignedVisitors) {
+      Sequence.next("group.id")
+        .then(function(id) {
+          unassignedVisitors.forEach(function(visitor) {
+            visitor.groupId = id;
+            visitor.save();
+          });
+
+          deferred.resolve(id);
+        });
+    });
+    
+  return deferred.promise;
+}
+
 /*
 * Hooks
 */

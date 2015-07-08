@@ -33,5 +33,6 @@ app.use(function (err, req, res, next) {
 });
 
 app.listen(config.port);
+console.log("Server started at %s", config.port);
 
-module.exports = app;
+exports.app = app;

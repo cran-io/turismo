@@ -12,5 +12,9 @@ module.exports = function(app) {
       });
   });
 
+  router.post("/end", function(req, res, next) {
+    
+  });
+
   app.use("/tour", router);
 }

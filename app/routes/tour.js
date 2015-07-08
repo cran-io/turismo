@@ -7,7 +7,7 @@ var mailer = require('../mailer/mailer');
 module.exports = function(app) {
   var router  = express.Router();
 
-  router.post("/start", function(req, res, next) {
+  router.post("/begin", function(req, res, next) {
     Visitor.assignGroup().
       then(function(id) {
         res.status(200).send({groupId: id});

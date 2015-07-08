@@ -31,9 +31,7 @@ describe("VisitorController", function(){
             .then(function(visitors) {
               expect(visitors.length).to.equal(1);
               done();
-            }).catch(function(err) {
-              done(err);
-            });
+            }).catch(done);
         });
     });
   });

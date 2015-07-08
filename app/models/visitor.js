@@ -1,11 +1,12 @@
 var mongoose = require('mongoose'),
     validator = require('validator');
 var Sequence = require('./sequence');
+var Group = require('./group');
 var Q = require('q');
 var Schema = mongoose.Schema;
 
 var VisitorSchema = new Schema({
-  visitorId: Number,
+  _id: Number,
   groupId: Number,
   name: {
     type: String,
@@ -66,15 +67,21 @@ VisitorSchema.statics.assignGroup = function() {
     then(function(unassignedVisitors) {
       Sequence.next("group.id")
         .then(function(id) {
+
+          var newGroup = new Group({ _id: id });
+
           unassignedVisitors.forEach(function(visitor) {
             visitor.groupId = id;
+            newGroup.visitors.push(visitor);
             visitor.save();
           });
+
+          newGroup.save();
 
           deferred.resolve(id);
         });
     });
-    
+
   return deferred.promise;
 }
 
@@ -86,7 +93,7 @@ VisitorSchema.pre('save', function(next){
   Sequence.findByIdAndUpdate({_id: 'visitor.id'}, {$inc: { seq: 1} }, function(error, sequence)   {
     if(error) return next(error);
 
-    thisDoc.visitorId = sequence.seq;
+    thisDoc._id = sequence.seq;
     next();
   });
 });

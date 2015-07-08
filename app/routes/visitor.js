@@ -1,10 +1,10 @@
  var express = require('express');
  var path = require('path');
- var utils = require('../../app/utils');
+ var utils = require('../utils');
  var _ = require('lodash');
 
  // Models
- var Visitor = require('../../app/models/visitor');
+ var Visitor = require('../models/visitor');
 
  var MAPPING_FILE_DIR = path.join(__dirname, '../../', 'config/reader-installation-mapping.xml');
  var mappingPromise = utils.parseXmlFile(MAPPING_FILE_DIR);

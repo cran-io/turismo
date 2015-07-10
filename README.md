@@ -44,3 +44,12 @@ Invocado en el momento que las personas salen del domo.
 #### Returns:
 - **HTTP 200**, si no hubo error.
 - **HTTP 500**, si hay error.
+
+### POST /image/upload
+Invocado para subir las fotos tomadas por las tablets.
+
+#### No params
+
+#### Returns:
+- **HTTP 200**, si no hubo error.
+- **HTTP 500**, si hay error.

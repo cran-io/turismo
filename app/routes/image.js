@@ -6,7 +6,7 @@ var multer = require('multer');
 var multerOpts = {
   dest: path.join(config.photos_dir, '/uploads'),
   rename: function(fieldname, filename) {
-    return filename;
+    return filename + "_" + Date.now();
   }
 };
 

@@ -26,6 +26,7 @@
     "lodash": "^3.10.0",
     "mandrill-api": "^1.0.45",
     "mongoose": "^4.0.6",
+    "multer": "^0.1.8",
     "node-osc": "^1.1.0",
     "q": "^1.4.1",
     "validator": "^3.40.1",

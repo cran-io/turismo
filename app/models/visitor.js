@@ -71,9 +71,13 @@ VisitorSchema.statics.assignGroup = function() {
           var newGroup = new Group({ _id: id });
 
           unassignedVisitors.forEach(function(visitor) {
-            visitor.groupId = id;
+
+            Visitor.update({_id: visitor._id}, {groupId: id}, function (err, n) {
+              if(err) throw deferred.reject(err);
+              console.log("Updated docs: ", n);
+            });
+
             newGroup.visitors.push(visitor);
-            visitor.save();
           });
 
           newGroup.save();

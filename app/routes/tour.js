@@ -20,7 +20,7 @@ module.exports = function(app) {
         if(err) next(err);
         var lastGroup = result[0];
 
-        mailer.send(lastGroup);
+        mailer.sendPhotos(lastGroup);
       })
   });
 

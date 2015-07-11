@@ -2,4 +2,8 @@
   <qrReader id="1">
     <installationAddress>127.0.0.1:9002</installationAddress>
   </qrReader>
+
+  <qrReader id="192.168.1.101" signupTotem="true">
+    <installationAddress>127.0.0.1:9002</installationAddress>
+  </qrReader>
 </qrReaders>

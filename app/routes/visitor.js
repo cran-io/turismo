@@ -2,6 +2,7 @@
  var path = require('path');
  var utils = require('../utils');
  var _ = require('lodash');
+ var osc = require('node-osc');
 
  // Models
  var Visitor = require('../models/visitor');
@@ -40,28 +41,46 @@ module.exports = function(app) {
   router.post('/checkin', function(req, res) {
     var checkin = req.body;
 
-    Visitor.findByQrCode(checkin.qrCode).
-      then(function(visitor) {
-        if(!visitor) res.status(404).send('Visitor not found');
+    console.log("Checkin received from: ", checkin.qrReaderId);
+    console.log("QRCode: ", checkin.qrCode);
 
-        mappingPromise.
-          then(function(mapping) {
-            var installations = installationsFrom(mapping, checkin.qrReaderId);
+    mappingPromise.
+      then(function(mapping) {
+        var installations = installationsFrom(mapping, checkin.qrReaderId);
 
-            installations.forEach(function(anInstallation) {
-              var ipPortArray = anInstallation.split(":");
-              var client = new osc.Client(ipPortArray[0], parseInt(ipPortArray[1]));
+        installations.installationAddress.forEach(function(anInstallation) {
+          var ipPortArray = anInstallation.split(":");
+          var client = new osc.Client(ipPortArray[0], parseInt(ipPortArray[1]));
 
-              client.send('/QRTag', checkin.qrReaderId, visitor.visitorId, visitor.groupId,
-                  visitor.name, visitor.email, visitor.age, visitor.preferenceRegion, function () {
-                client.kill();
-                res.status(200);
-                res.send();
-              });
+          if(installations.$.signupTotem){
+            console.log("Sending OSC message to: ", anInstallation);
+            client.send('/QRTag', checkin.qrCode, function () {
+              client.kill();
             });
-          });
-      }).
-      catch(function(err) {
+          } else {
+            Visitor.findByQrCode(checkin.qrCode)
+              .then(function(visitor) {
+                if(!visitor) res.status(404).send('Visitor not found');
+
+                console.log("Sending OSC message to: ", anInstallation);
+                client.send('/QRTag', checkin.qrReaderId, visitor._id, visitor.groupId,
+                    visitor.name, visitor.email, visitor.age, visitor.preferenceRegion, function () {
+
+                    client.kill();
+                });
+              });
+          }
+
+          res.status(200);
+          res.send();
+        });
+      });
+
+    Visitor.findByQrCode(checkin.qrCode)
+      .then(function(visitor) {
+        if(!visitor) res.status(404).send('Visitor not found');
+      })
+      .catch(function(err) {
         next(err);
       });
   });
@@ -71,7 +90,7 @@ module.exports = function(app) {
   function installationsFrom(result, qrReaderId) {
       return _.select(result.qrReaders.qrReader, function(element) {
                     return element.$.id == qrReaderId;
-                  })[0].installationAddress;
+                  })[0];
   }
 
 };

@@ -33,7 +33,6 @@ module.exports = function(app) {
 
   /**
   * Checking en lector qr:
-  *   - qrReaderId
   *   - qrCode
   **/
   router.post('/checkin', function(req, res) {
@@ -53,8 +52,8 @@ module.exports = function(app) {
               var ipPortArray = anInstallation.split(":");
               var client = new osc.Client(ipPortArray[0], parseInt(ipPortArray[1]));
 
-              client.send('/QRTag', parseInt(checkin.qrReaderId), visitor.visitorId, visitor.name, visitor.email, visitor.age, visitor.preferenceRegion,
-              function () {
+              client.send('/QRTag', parseInt(checkin.qrReaderId), visitor.visitorId, visitor.groupId,
+                  visitor.name, visitor.email, visitor.age, visitor.preferenceRegion, function () {
                 client.kill();
                 res.status(200);
                 res.send();

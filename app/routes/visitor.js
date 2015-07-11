@@ -23,6 +23,7 @@ module.exports = function(app) {
   **/
   router.post('/signup', function(req, res, next) {
     var newVisitor = new Visitor(req.body);
+
     newVisitor.save(function(err) {
       if(err) next(err);
 
@@ -51,7 +52,7 @@ module.exports = function(app) {
               var ipPortArray = anInstallation.split(":");
               var client = new osc.Client(ipPortArray[0], parseInt(ipPortArray[1]));
 
-              client.send('/QRTag', parseInt(checkin.qrReaderId), visitor.visitorId, visitor.groupId,
+              client.send('/QRTag', checkin.qrReaderId, visitor.visitorId, visitor.groupId,
                   visitor.name, visitor.email, visitor.age, visitor.preferenceRegion, function () {
                 client.kill();
                 res.status(200);
@@ -68,10 +69,9 @@ module.exports = function(app) {
   app.use("/visitor", router);
 
   function installationsFrom(result, qrReaderId) {
-    return Object.keys(result.qrReaders.qrReader).
-                filter(function(element) {
-                  return element.$.id == qrReaderId;
-                })[0].installationAddress;
+      return _.select(result.qrReaders.qrReader, function(element) {
+                    return element.$.id == qrReaderId;
+                  })[0].installationAddress;
   }
 
 };

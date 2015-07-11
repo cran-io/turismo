@@ -1,12 +1,4 @@
 <qrReaders>
-  <qrReader id="reader1">
-    <installationAddress>127.0.0.1:9001</installationAddress>
-    <installationAddress>127.0.0.2:9001</installationAddress>
-  </qrReader>
-  <qrReader id="reader2">
-    <installationAddress>127.0.0.1:9001</installationAddress>
-    <installationAddress>127.0.0.2:9001</installationAddress>
-  </qrReader>
   <qrReader id="1">
     <installationAddress>127.0.0.1:9002</installationAddress>
   </qrReader>

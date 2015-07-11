@@ -33,12 +33,11 @@ module.exports = function(app) {
 
   /**
   * Checking en lector qr:
+  *   - qrReaderId
   *   - qrCode
   **/
   router.post('/checkin', function(req, res) {
     var checkin = req.body;
-    var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    console.log("checkin received from: " + ip);
 
     Visitor.findByQrCode(checkin.qrCode).
       then(function(visitor) {
@@ -46,7 +45,7 @@ module.exports = function(app) {
 
         mappingPromise.
           then(function(mapping) {
-            var installations = installationsFrom(mapping, ip);
+            var installations = installationsFrom(mapping, checkin.qrReaderId);
 
             installations.forEach(function(anInstallation) {
               var ipPortArray = anInstallation.split(":");

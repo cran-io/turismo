@@ -6,12 +6,13 @@ var config = require('./utils').config();
 var app = express();
 app.use(bodyParser.json());
 
+console.log("Connecting to db: %s", config.db);
 var db = mongoose.connect(config.db);
 
 // Initialize Routes
 require('./routes')(app);
 // Start OSC server
-require('./osc-server')(config.osc.port);
+require('./osc/server')(config.osc.port);
 
 /*
 * Middleware

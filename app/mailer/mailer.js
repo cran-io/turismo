@@ -1,22 +1,74 @@
 var Mandrill = require('mandrill-api/mandrill').Mandrill;
-var fs = require('fs');
 var path = require('path');
+var Q = require('q');
 var config = require('../utils').config();
+var fs = require('fs');
 
-// Path to shared folder containing visitor photos.
-var ROOT_PATH = "/root";
+var ROOT_PATH = config.photos_dir;
 
-var apiKey = process.env.MANDRILL_API;
-var mancrillClient = new Mandrill(apiKey);
+var apiKey = process.env.MANDRILL_API_KEY;
+var mandrillClient = new Mandrill(apiKey);
 
-var send = function(group) {
+var sendPhotos = function(group) {
 
-  var pathToDomePhotos = path.join(ROOT_PATH, group._id.toString(), '/dome');
+  var domeDir = path.join(ROOT_PATH, group._id.toString(), '/dome');
+
+  var encodedDomePhotos = fs.readdirSync(domeDir).
+                              map(readFiles(domeDir)).
+                              map(encodeBase64);
+
+  var recipients = [];
+  var mergeVars = [];
 
   group.visitors.forEach(function(visitor) {
-    var pathToVisitorPhotos = path.join(ROOT_PATH, group._id.toString(), visitor._id.toString());
-    console.log("Email sent to: %s", visitor.email)
+    var visitorDir = path.join(ROOT_PATH, group._id.toString(), visitor._id.toString());
+
+    var encodedVisitorPhotos = fs.readdirSync(visitorDir).
+                                   map(readFiles(visitorDir)).
+                                   map(encodeBase64);
+    var recipient = {
+      email: visitor.email,
+      name: visitor.name,
+      type: "bcc"
+    };
+
+    var recipientMergeVar = {
+      rcpt: visitor.email,
+      vars: [{
+        name: "images",
+        content: encodedDomePhotos.concat(encodedVisitorPhotos)
+      }]
+    };
+
+    mergeVars.push(recipientMergeVar);
+    recipients.push(recipient);
+
+  });
+
+  var message = {
+    "to" : recipients,
+    "merge_vars" : mergeVars
+  };
+
+  mandrillClient.messages.sendTemplate({
+    "template_name": "sensorium",
+    "message": message
+  }, function (result) {
+    console.log(result);
+  }, function (error) {
+    console.log('A mandrill error occurred: ' + error.name + ' - ' + error.message);
   });
 };
 
-exports.send = send;
+
+function readFiles(baseDir) {
+  return function (file) {
+    return fs.readFileSync(path.join(baseDir, file));
+  }
+}
+
+function encodeBase64(photo) {
+  return new Buffer(photo).toString('base64');
+}
+
+exports.sendPhotos = sendPhotos;

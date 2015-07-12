@@ -75,14 +75,6 @@ module.exports = function(app) {
           res.send();
         });
       });
-
-    Visitor.findByQrCode(checkin.qrCode)
-      .then(function(visitor) {
-        if(!visitor) res.status(404).send('Visitor not found');
-      })
-      .catch(function(err) {
-        next(err);
-      });
   });
 
   app.use("/visitor", router);

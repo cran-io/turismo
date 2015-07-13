@@ -25,11 +25,13 @@
    router.post('/signup', function(req, res, next) {
      var newVisitor = new Visitor(req.body);
 
-     newVisitor.save(function(err) {
+     newVisitor.save(function(err, visitor) {
        if (err) next(err);
 
        res.status(200);
-       res.send();
+       res.send({
+         visitorId: visitor._id
+       });
      });
    });
 
@@ -60,7 +62,8 @@
            } else {
              Visitor.findByQrCode(checkin.qrCode)
                .then(function(visitor) {
-                 if (!visitor) res.status(404).send('Visitor not found');
+                 if (!visitor) res.status(404)
+                   .send('Visitor not found');
 
                  console.log("Sending OSC message to: ", anInstallation);
                  client.send('/QRTag', checkin.qrReaderId, visitor._id, visitor.groupId,

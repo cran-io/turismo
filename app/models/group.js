@@ -1,5 +1,6 @@
 var Q = require('q');
 var mongoose = require('mongoose');
+var timestamps = require('mongoose-timestamp');
 var Schema = mongoose.Schema;
 
 var GroupSchema = Schema({
@@ -7,6 +8,7 @@ var GroupSchema = Schema({
   visitors: []
 });
 
+GroupSchema.plugin(timestamps);
 var Group = mongoose.model('Group', GroupSchema);
 
 module.exports = Group;

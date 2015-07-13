@@ -4,6 +4,7 @@ var Sequence = require('./sequence');
 var Group = require('./group');
 var Q = require('q');
 var Schema = mongoose.Schema;
+var timestamps = require('mongoose-timestamp');
 
 var VisitorSchema = new Schema({
   _id: Number,
@@ -27,10 +28,6 @@ var VisitorSchema = new Schema({
   qrCode: {
     type: String,
     required: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
   }
 });
 
@@ -101,6 +98,8 @@ VisitorSchema.pre('save', function(next){
     next();
   });
 });
+
+VisitorSchema.plugin(timestamps);
 
 var Visitor = mongoose.model('Visitor', VisitorSchema);
 

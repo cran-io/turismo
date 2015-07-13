@@ -1,33 +1,33 @@
-var Mandrill = require('mandrill-api/mandrill')
-  .Mandrill;
+var Mandrill = require('mandrill-api/mandrill').Mandrill;
 var path = require('path');
 var Q = require('q');
-var config = require('../utils')
-  .config();
+var config = require('../utils').config();
 var fs = require('fs');
+var moment = require('moment');
 
 var ROOT_PATH = config.photos_dir;
+var MANDRILL_TIME_FORMAT = "YYYY-MM-DD HH:MM:SS";
 
-var apiKey = process.env.MANDRILL_API_KEY;
-var mandrillClient = new Mandrill(apiKey);
+var mandrillClient = new Mandrill(process.env.MANDRILL_API_KEY);
 
 var sendPhotos = function(group) {
+  var deferred = Q.defer();
 
-  var domeDir = path.join(ROOT_PATH, group._id.toString(), '/dome');
+  var domeUrl = [group._id, "dome"].join("/");
+  var domeDir = path.join(ROOT_PATH, domeUrl);
 
-  var encodedDomePhotos = fs.readdirSync(domeDir)
-    .map(readFiles(domeDir))
-    .map(encodeBase64);
+  var domePhotosURLs = fs.readdirSync(domeDir)
+    .map(filesUrl(domeUrl));
 
   var recipients = [];
   var mergeVars = [];
 
   group.visitors.forEach(function(visitor) {
-    var visitorDir = path.join(ROOT_PATH, group._id.toString(), visitor._id.toString());
+    var visitorUrl = [group._id, visitor._id].join("/");
+    var visitorDir = path.join(ROOT_PATH, visitorUrl);
 
-    var encodedVisitorPhotos = fs.readdirSync(visitorDir)
-      .map(readFiles(visitorDir))
-      .map(encodeBase64);
+    var visitorPhotosURLs = fs.readdirSync(visitorDir)
+      .map(filesUrl(visitorUrl));
 
     var recipient = {
       email: visitor.email,
@@ -39,13 +39,12 @@ var sendPhotos = function(group) {
       rcpt: visitor.email,
       vars: [{
         name: "images",
-        content: encodedDomePhotos.concat(encodedVisitorPhotos)
+        content: domePhotosURLs.concat(visitorPhotosURLs)
       }]
     };
 
     mergeVars.push(recipientMergeVar);
     recipients.push(recipient);
-
   });
 
   var message = {
@@ -53,27 +52,30 @@ var sendPhotos = function(group) {
     "merge_vars": mergeVars
   };
 
-  console.log(JSON.stringify(message));
-  // mandrillClient.messages.sendTemplate({
-  //   "template_name": "sensorium",
-  //   "message": message
-  // }, function(result) {
-  //   console.log(result);
-  // }, function(error) {
-  //   console.log('A mandrill error occurred: ' + error.name + ' - ' + error.message);
-  // });
+  var templateContent = [];
+
+  var utcTime = moment().utc();
+
+  mandrillClient.messages.sendTemplate({
+    "template_name": "sensorium",
+    "template_content": [],
+    "message": message,
+    "send_at": utcTime.add(1, "hour").format(MANDRILL_TIME_FORMAT)
+  }, function(result) {
+    console.log(result);
+    deferred.resolve(result);
+  }, function(error) {
+    console.log(error);
+    deferred.reject(error);
+  });
+
+  return deferred.promise;
 };
 
-
-function readFiles(baseDir) {
+function filesUrl(baseUrl) {
   return function(file) {
-    return fs.readFileSync(path.join(baseDir, file));
+    return config.dropboxRoot + [baseUrl, encodeURIComponent(file)].join("/");
   }
-}
-
-function encodeBase64(photo) {
-  return new Buffer(photo)
-    .toString('base64');
 }
 
 exports.sendPhotos = sendPhotos;

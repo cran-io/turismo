@@ -19,11 +19,12 @@ module.exports = function(app) {
   router.post("/end", function(req, res, next) {
     Group.find().sort({ _id: -1 }).limit(1)
       .exec(function(err, result) {
-        if (err) next(err);
-        var lastGroup = result[0];
+          if (err) next(err);
+          var lastGroup = result[0];
 
         mailer.sendPhotos(lastGroup);
-      })
+      });
+
   });
 
   app.use("/tour", router);

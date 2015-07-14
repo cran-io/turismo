@@ -25,6 +25,7 @@ module.exports = function(app) {
         mailer.sendPhotos(lastGroup);
       });
 
+    res.status(200).send();
   });
 
   app.use("/tour", router);

@@ -8,7 +8,15 @@ describe("VisitorController", function(){
     Visitor.remove(function(err) {
       if(err) done(err);
       done();
-    })
+    });
+  });
+
+  after(function(done){
+    Visitor.remove(function(err) {
+      if(err) done(err);
+      mongoose.connection.close()
+      done();
+    });
   });
 
   describe("POST /signup", function(){

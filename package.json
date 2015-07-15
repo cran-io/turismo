@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node app/server.js",
-    "test": "NODE_ENV=development mocha",
+    "test": "NODE_ENV=test mocha",
     "debug": "node-inspector & nodemon --debug app/server.js",
     "debug-only": "nodemon --debug app/server.js"
   },
@@ -39,6 +39,7 @@
     "mocha": "^2.2.5",
     "node-inspector": "^0.11.0",
     "nodemon": "^1.3.7",
+    "sinon": "^1.15.4",
     "supertest": "^1.0.1"
   }
 }

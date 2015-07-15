@@ -13,6 +13,8 @@ var db = mongoose.connect(config.db);
 require('./routes')(app);
 // Start OSC server
 require('./osc/server')(config.osc.port);
+// Schedule task
+require('./scheduled-tasks/statistics-email-task').schedule();
 
 /*
 * Middleware

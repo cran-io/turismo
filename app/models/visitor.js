@@ -103,4 +103,9 @@ VisitorSchema.plugin(timestamps);
 
 var Visitor = mongoose.model('Visitor', VisitorSchema);
 
+Sequence.find({_id: 'visitor.id'}, function (err, results) {
+  if(err) throw err;
+  if(results.length == 0) Sequence.create({_id: 'visitor.id', seq: 0});
+})
+
 module.exports = Visitor;

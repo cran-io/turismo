@@ -1,9 +1,13 @@
-var Mandrill = require('mandrill-api/mandrill').Mandrill;
+var Mandrill = require('mandrill-api/mandrill')
+  .Mandrill;
 var path = require('path');
 var Q = require('q');
-var config = require('../utils').config();
+var config = require('../utils')
+  .config();
 var fs = require('fs');
 var moment = require('moment');
+var CronJob = require('cron')
+  .CronJob;
 
 var ROOT_PATH = config.photos_dir;
 var MANDRILL_TIME_FORMAT = "YYYY-MM-DD HH:MM:SS";
@@ -54,13 +58,15 @@ var sendPhotos = function(group) {
 
   var templateContent = [];
 
-  var utcTime = moment().utc();
+  var utcTime = moment()
+    .utc();
 
   mandrillClient.messages.sendTemplate({
     "template_name": "sensorium",
     "template_content": [],
     "message": message,
-    "send_at": utcTime.add(1, "hour").format(MANDRILL_TIME_FORMAT)
+    "send_at": utcTime.add(1, "hour")
+      .format(MANDRILL_TIME_FORMAT)
   }, function(result) {
     console.log(result);
     deferred.resolve(result);
@@ -71,6 +77,33 @@ var sendPhotos = function(group) {
 
   return deferred.promise;
 };
+
+exports.sendStatistics = function(statistics) {
+  console.log(statistics);
+  mandrillClient.messages.sendTemplate({
+    "template_name": "sensorium-statistics",
+    "template_content": [],
+    "message": {
+      "to": [{
+        "email": "mmaquiel@cran.io",
+        "name": "matias",
+        "type": "to"
+      }],
+      "global_merge_vars": [{
+        name: "totalVisits",
+        value: statistics.totalVisits
+      },
+      {
+        name: "lastDayVisits",
+        value: statistics. lastDayVisits
+      }]
+    }
+  }, function(result) {
+    console.log(result);
+  }, function(error) {
+    console.log(error);
+  });
+}
 
 function filesUrl(baseUrl) {
   return function(file) {

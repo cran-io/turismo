@@ -9,6 +9,8 @@ exports.schedule = function () {
     var today = moment().startOf('day');
     var tomorrow = moment(today).add(1, 'days');
 
+    console.log("Querying visitors between %s and %s", today, tomorrow);
+
     var lastDayCountQuery = Visitor.where({
       createdAt: {
         $gte: today.toDate(),

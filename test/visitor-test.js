@@ -2,6 +2,7 @@ var expect = require('expect.js');
 var request = require('supertest');
 var Visitor = require('../app/models/visitor.js');
 var app = require('../app/server').app;
+var mongoose = require('mongoose');
 
 describe("VisitorController", function(){
   beforeEach(function(done){

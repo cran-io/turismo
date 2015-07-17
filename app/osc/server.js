@@ -23,7 +23,7 @@ module.exports = function(port) {
       })
       .limit(1)
       .exec(function(err, result) {
-        if (err) next(err);
+        if (err) return next(err);
         var lastGroup = result[0];
 
         mailer.sendPhotos(lastGroup);

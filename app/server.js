@@ -23,7 +23,7 @@ app.use(function (err, req, res, next) {
   var errors = [];
 
   if(err.name !== 'ValidationError') {
-    next(err);
+    return next(err);
   } else {
     Object.keys(err.errors).forEach(function(mongoField) {
       var errorObj = err.errors[mongoField];

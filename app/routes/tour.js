@@ -19,7 +19,7 @@ module.exports = function(app) {
   router.post("/end", function(req, res, next) {
     Group.find().sort({ _id: -1 }).limit(1)
       .exec(function(err, result) {
-          if (err) next(err);
+          if (err) return next(err);
           var lastGroup = result[0];
 
         mailer.sendPhotos(lastGroup);

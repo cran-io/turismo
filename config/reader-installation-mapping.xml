@@ -1,9 +1,8 @@
-<qrReaders>
-  <qrReader id="1">
-    <installationAddress>127.0.0.1:9002</installationAddress>
-  </qrReader>
+<installations>
 
-  <qrReader id="192.168.1.101" signupTotem="true">
-    <installationAddress>127.0.0.1:9002</installationAddress>
-  </qrReader>
-</qrReaders>
+  <installation  ip="127.0.0.1" port="12001" name="croma-1">
+    <qrReader name="raspi_1">192.168.0.1</qrReader>
+    <qrReader name="raspi_2">192.168.0.2</qrReader>
+  </installation>
+
+</installations>

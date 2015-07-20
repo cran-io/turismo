@@ -52,8 +52,10 @@ module.exports = function(app) {
       .then(function (installation) {
         var client = new osc.Client(installation.ip, installation.port);
 
+        console.log(JSON.stringify(installation));
+
         if(installation.isTotem){
-          console.log("Sending OSC message to: ", anInstallation);
+          console.log("Sending OSC message to: ", installation);
           client.send('/QRTag', checkin.qrCode, function() {
             client.kill();
           });
@@ -63,8 +65,9 @@ module.exports = function(app) {
               if (!visitor) res.status(404).send('Visitor not found');
 
               var groupId = visitor.groupId || 0;
-              console.log("Sending OSC message to: ", anInstallation);
-              client.send('/QRTag', checkin.qrReaderId, visitor._id, visitor.groupId,
+              var readerId = parseInt(installation.ip.split(".")[3])
+              console.log("Sending OSC message to: ", installation);
+              client.send('/QRTag', readerId, visitor._id, groupId,
                 visitor.name, visitor.email, visitor.age, visitor.preferenceRegion,
                 function() {
 
@@ -72,6 +75,8 @@ module.exports = function(app) {
               });
             });
         }
+
+        res.status(200).send();
       });
   });
 

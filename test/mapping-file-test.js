@@ -1,10 +1,10 @@
 var expect = require('expect.js');
-var InstallationMaping  = require('../config/installation-mapping');
+var InstallationMapping  = require('../config/installation-mapping');
 var path = require('path');
 
 describe("InstallationMapping", function(){
 
-  var installationMapping = new InstallationMaping(path.join(__dirname,'fixtures/installation-mapping-fixture.xml'));
+  var installationMapping = new InstallationMapping(path.join(__dirname,'fixtures/installation-mapping-fixture.xml'));
   describe("#findByReaderIP with 192.168.101.101", function(){
 
     var installationsPromise = installationMapping.findByReaderIP("192.168.101.101");
@@ -23,7 +23,7 @@ describe("InstallationMapping", function(){
   });
 
   describe("#findByReaderIP for a totem", function(){
-    var installationMapping = new InstallationMaping(path.join(__dirname,'fixtures/totem-fixture.xml'));
+    var installationMapping = new InstallationMapping(path.join(__dirname,'fixtures/totem-fixture.xml'));
 
     var installationsPromise = installationMapping.findByReaderIP("192.168.101.101");
 

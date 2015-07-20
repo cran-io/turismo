@@ -8,4 +8,9 @@
     <qrReader name="raspi_3">192.168.101.103</qrReader>
     <qrReader name="raspi_4">192.168.101.104</qrReader>
   </installation>
+
+  <installation ip="127.0.0.1" port="12000">
+    <qrReader name="raspi_5">127.0.0.3</qrReader>
+    <qrReader name="raspi_6">127.0.0.4</qrReader>
+  </installation>
 </installations>

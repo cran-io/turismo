@@ -1,12 +1,15 @@
-var osc = require('node-osc');
+  var osc = require('node-osc');
 var Group = require('../models/group');
 var Visitor = require('../models/visitor');
 var utils = require('../utils');
 var _ = require("lodash");
+var path = require('path');
+
+var InstallationMapping = require(path.join(__dirname, '../../', 'config/installation-mapping'));
+var mapping = new InstallationMapping(path.join(__dirname, '../../', 'config/reader-installation-mapping.xml'));
 
 var groupId;
 
-//TODO: Refactor me!
 module.exports = function(port) {
   var oscServer = new osc.Server(port, '0.0.0.0');
 
@@ -34,7 +37,7 @@ module.exports = function(port) {
     Visitor.assignGroup()
       .then(function(id) {
         groupId = id;
-        utils.mapping()
+        mapping.findAllEquipment()
           .then(function (installations) {
             var filteredInstallations = rejectRegistrationTotems(installations);
 
@@ -53,7 +56,7 @@ module.exports = function(port) {
   });
 
   oscServer.on("/videoClosureStarted", function (msg, rinfo) {
-    utils.mapping()
+    mapping.findAllEquipment()
       .then(function (installations) {
         var filteredInstallations = rejectRegistrationTotems(installations);
 
@@ -79,11 +82,7 @@ module.exports = function(port) {
 };
 
 function rejectRegistrationTotems(installations) {
-  return _(installations.qrReaders.qrReader)
-    .reject(function (qrReader) {
-      return qrReader.$.signupTotem === "true";
-    })
-    .map(function (elem) {
-      return elem.installationAddress;
-    }).value();
+  return _.reject(installations, function (equipment) {
+    return equipment.isTotem == "true";
+  });
 }

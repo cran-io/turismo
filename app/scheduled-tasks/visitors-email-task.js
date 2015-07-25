@@ -13,8 +13,18 @@ var dropboxRoot = config.dropboxRooot;
 exports.schedule = function () {
   var job = new CronJob("00 24 00 * * *", function () {
     console.log("Visitors email task started");
+      // var query = {
+      //   $or: [
+      //     {
+      //       emailSent: false
+      //     },
+      //     {
+      //       emailSent: { $exists: false}
+      //     }]
+      // };
 
-      Visitor.find({$or: [{emailSent: false}, {emailSent: {$exists: false} }] }, function (err, result) {
+      var query = { _id: 3389 };
+      Visitor.find(query, function (err, result) {
       console.log("Total emails to be sent: ", result.length);
 
       result.forEach(function (visitor) {
@@ -28,11 +38,6 @@ exports.schedule = function () {
             var expertosPhotos = _.select(photos, function (elem) {
               return _.startsWith(elem, "experto_");
             }).map(filesUrl(visitor._id));
-
-            var visitor = {
-              email: "mmaquiel@cran.io",
-              name: "Matias Maquiel"
-            }
 
             var recipient = {
               email: visitor.email,
@@ -67,11 +72,11 @@ exports.schedule = function () {
 
             console.log(opts);
 
-            // mandrillClient.messages.sendTemplate(opts, function(result) {
-            //   console.log(result);
-            // }, function(error) {
-            //   console.log(error);
-            // });
+            mandrillClient.messages.sendTemplate(opts, function(result) {
+              console.log(result);
+            }, function(error) {
+              console.log(error);
+            });
 
           }
         });

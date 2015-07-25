@@ -11,24 +11,23 @@ var PHOTOS_PATH = config.photos_dir;
 var dropboxRoot = config.dropboxRooot;
 
 exports.schedule = function () {
-  var job = new CronJob("00 22 18 * * *", function () {
+  var job = new CronJob("00 24 00 * * *", function () {
     console.log("Visitors email task started");
 
       Visitor.find({$or: [{emailSent: false}, {emailSent: {$exists: false} }] }, function (err, result) {
       console.log("Total emails to be sent: ", result.length);
 
       result.forEach(function (visitor) {
-        var visitorPhotosPath = [0, visitor._id].join("/");
-
+        var visitorPhotosPath = ["0", visitor._id].join("/");
         fs.readdir(path.join(PHOTOS_PATH, visitorPhotosPath), function (err, photos) {
           if(photos){
             var cromaPhotos = _.select(photos, function (elem) {
               return _.startsWith(elem, "croma_");
-            }).map(filesUrl());
+            }).map(filesUrl(visitor._id));
 
             var expertosPhotos = _.select(photos, function (elem) {
               return _.startsWith(elem, "experto_");
-            }).map(filesUrl());
+            }).map(filesUrl(visitor._id));
 
             console.log("Croma photos of visitor %d: ", visitor._id, cromaPhotos);
             console.log("Expertos photos of visitor %d: ", visitor._id, expertosPhotos);
@@ -42,8 +41,8 @@ exports.schedule = function () {
   job.start();
 }
 
-function filesUrl() {
+function filesUrl(visitorId) {
   return function(file) {
-    return config.dropboxRoot + [0, encodeURIComponent(file)].join("/");
+    return config.dropboxRoot + ["0", visitorId, encodeURIComponent(file)].join("/");
   }
 }

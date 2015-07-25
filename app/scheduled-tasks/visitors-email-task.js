@@ -29,8 +29,50 @@ exports.schedule = function () {
               return _.startsWith(elem, "experto_");
             }).map(filesUrl(visitor._id));
 
-            console.log("Croma photos of visitor %d: ", visitor._id, cromaPhotos);
-            console.log("Expertos photos of visitor %d: ", visitor._id, expertosPhotos);
+            var visitor = {
+              email: "mmaquiel@cran.io",
+              name: "Matias Maquiel"
+            }
+
+            var recipient = {
+              email: visitor.email,
+              name: visitor.name,
+              type: "to"
+            };
+
+            var recipientMergeVar = {
+              rcpt: visitor.email,
+              vars: [
+                {
+                  name: "croma",
+                  content: cromaPhotos
+                },
+                {
+                  name: "valijas",
+                  content: expertosPhotos
+                }]
+            };
+
+            var message = {
+              "to": [recipient],
+              "merge_vars": [recipientMergeVar],
+              "merge_language": "handlebars"
+            };
+
+            var opts = {
+              "template_name": "turismo-ruta-40",
+              "template_content": [],
+              "message": message
+            };
+
+            console.log(opts);
+
+            // mandrillClient.messages.sendTemplate(opts, function(result) {
+            //   console.log(result);
+            // }, function(error) {
+            //   console.log(error);
+            // });
+
           }
         });
       });

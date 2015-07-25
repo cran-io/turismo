@@ -46,6 +46,15 @@
     <qrReader name="raspi-miles-6">192.168.111.106</qrReader>
   </installation>
 
+  <installation ip="192.168.112.1" port="12000" name="VALIJAS-1">
+    <qrReader name="raspi-valijas-1">192.168.112.101</qrReader>
+    <qrReader name="raspi-valijas-2">192.168.112.104</qrReader>
+  </installation>
+  <installation ip="192.168.112.2" port="12000" name="VALIJAS-2">
+    <qrReader name="raspi-valijas-3">192.168.112.102</qrReader>
+    <qrReader name="raspi-valijas-4">192.168.112.103</qrReader>
+  </installation>
+
   <installation ip="192.168.113.1" port="12000" name="EXPERTO-1">
     <qrReader name="raspi-experto-1">192.168.113.101</qrReader>
     <qrReader name="raspi-experto-2">192.168.113.104</qrReader>
@@ -55,6 +64,7 @@
     <qrReader name="raspi-experto-3">192.168.113.102</qrReader>
     <qrReader name="raspi-experto-4">192.168.113.103</qrReader>
   </installation>
+
 
 
   <installation ip="192.168.116.1" port="12000" name="CROMA-1">

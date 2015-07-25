@@ -13,7 +13,7 @@ var PHOTOS_PATH = config.photos_dir;
 var MANDRILL_TIME_FORMAT = "YYYY-MM-DD HH:MM:SS";
 
 exports.schedule = function () {
-  var job = new CronJob("00 24 00 * * *", function () {
+  var job = new CronJob("00 00 00 * * *", function () {
     console.log("Visitors email task started");
       var query = {
         $or: [
@@ -62,23 +62,22 @@ exports.schedule = function () {
               "merge_language": "handlebars"
             };
 
+            var utcTime = moment().utc();
+
             var opts = {
               "template_name": "turismo-ruta-40",
               "template_content": [],
-              "message": message,
-              "send_at": moment().add(5, "minutes").format(MANDRILL_TIME_FORMAT)
+              "message": message
             };
 
-            console.log(opts);
+            console.log(JSON.stringify(opts));
 
             mandrillClient.messages.sendTemplate(opts, function(result) {
               console.log(result);
             }, function(error) {
               console.log(error);
             });
-
-            Visitor.update({_id: visitor._id}, {emailSent: true}, function (err, n) {
-              if(err) throw err;
+            Visitor.update({_id: visitor._id}, { emailSent: true }, function (err, n) {
               console.log("Visitors updated: ", n);
             });
           }
@@ -93,16 +92,16 @@ exports.schedule = function () {
 
 function filesUrl(visitorId) {
   return function(file) {
-
-    var relativeDir = ["0", visitorId, encodeURIComponent(file)].join("/");
+    var downCaseFile = file.toLowerCase();
+    var relativeDir = ["/sensorium-photos", "0", visitorId, encodeURIComponent(downCaseFile)].join("/");
 
     request(config.tecnoboxServer + "/sync_image?q=" + relativeDir, function (err, res, body) {
       console.log(err);
     });
 
     return {
-      thumbnail: [config.tecnoboxServer, "thumbnails", encodeURIComponent(file)].join("/"),
-      photo: config.dropboxRoot + ["0", visitorId, encodeURIComponent(file)].join("/")
+      thumbnail: [config.tecnoboxServer, "thumbnails", encodeURIComponent(downCaseFile)].join("/"),
+      photo: config.dropboxRoot + ["0", visitorId, encodeURIComponent(downCaseFile)].join("/")
     }
   }
 }

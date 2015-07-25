@@ -65,7 +65,8 @@ module.exports = function(app) {
               if (!visitor) res.status(404).send('Visitor not found');
 
               var groupId = visitor.groupId || 0;
-              var readerId = parseInt(installation.ip.split(".")[3])
+              var readerId = parseInt(checkin.qrReaderId.split(".")[3])%10;
+              console.log("ReaderId: ", readerId);
               console.log("Sending OSC message to: ", installation);
               client.send('/QRTag', readerId, visitor._id, groupId,
                 visitor.name, visitor.email, visitor.age, visitor.preferenceRegion,

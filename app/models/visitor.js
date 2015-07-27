@@ -28,6 +28,9 @@ var VisitorSchema = new Schema({
   qrCode: {
     type: String,
     required: true
+  },
+  emailSent: {
+    default: false
   }
 });
 

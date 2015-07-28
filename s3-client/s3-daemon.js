@@ -6,10 +6,12 @@ var mime = require('mime');
 var gm = require('gm').subClass({ imageMagick: true });
 var walk = require('walk');
 var Q = require("q");
+var readFile = Q.nfbind(fs.readFile);
 
 AWS.config.region = "sa-east-1";
 
-var s3 = new AWS.S3({params: {Bucket: "turismo-site-test"} });
+var s3 = new AWS.S3({params: {Bucket: config.S3.bucket} });
+var uploadToS3 = Q.nbind(s3.upload);
 var walker = walk.walk(config.photos_dir, { followLinks: false });
 
 var separator = process.platform === "win32" ? "\\" : "/";
@@ -97,17 +99,6 @@ function resize(file) {
         if(err) deferred.reject();
         deferred.resolve(data);
     });
-
-  return deferred.promise;
-}
-
-function readFile(path) {
-  var deferred = Q.defer();
-
-  fs.readFile(path, function (err, data) {
-    if(err) deferred.reject(err);
-    deferred.resolve(data);
-  });
 
   return deferred.promise;
 }

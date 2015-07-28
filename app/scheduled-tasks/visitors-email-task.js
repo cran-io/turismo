@@ -30,11 +30,11 @@ exports.schedule = function () {
           if(photos){
             var cromaPhotos = _.select(photos, function (elem) {
               return _.startsWith(elem, "croma_");
-            }).map(filesUrl(visitor._id));
+            }).map(filesUrl());
 
             var expertosPhotos = _.select(photos, function (elem) {
               return _.startsWith(elem, "experto_");
-            }).map(filesUrl(visitor._id));
+            }).map(filesUrl());
 
 
             var recipient = {
@@ -90,18 +90,13 @@ exports.schedule = function () {
   job.start();
 }
 
-function filesUrl(visitorId) {
+function filesUrl() {
   return function(file) {
     var downCaseFile = file.toLowerCase();
-    var relativeDir = ["/sensorium-photos", "0", visitorId, encodeURIComponent(downCaseFile)].join("/");
-
-    request(config.tecnoboxServer + "/sync_image?q=" + relativeDir, function (err, res, body) {
-      console.log(err);
-    });
 
     return {
-      thumbnail: [config.tecnoboxServer, "thumbnails", encodeURIComponent(downCaseFile)].join("/"),
-      photo: config.dropboxRoot + ["0", visitorId, encodeURIComponent(downCaseFile)].join("/")
+      thumbnail: [config.S3.url, "thumbnails", encodeURIComponent(downCaseFile)].join("/"),
+      photo:  [config.S3.url, "sources", encodeURIComponent(downCaseFile)].join("/")
     }
   }
 }

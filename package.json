@@ -39,6 +39,7 @@
     "q": "^1.4.1",
     "request": "^2.60.0",
     "validator": "^3.40.1",
+    "walk": "^2.3.9",
     "xml2js": "^0.4.9"
   },
   "devDependencies": {

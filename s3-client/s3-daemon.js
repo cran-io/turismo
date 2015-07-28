@@ -2,8 +2,8 @@ var fs = require('fs');
 var chokidar = require('chokidar');
 var config = require('../app/utils').config();
 var AWS = require('aws-sdk');
-var sharp = require('sharp');
 var mime = require('mime');
+var gm = require('gm').subClass({ imageMagick: true });
 
 AWS.config.region = "sa-east-1";
 
@@ -23,10 +23,11 @@ chokidar.watch(config.photos_dir, options).on("add", function (path) {
   fs.readFile(path, function (err, file) {
     if(err) throw err;
 
+    var photoMimeType = mime.lookup(path);
     var params = {
       Key: sourceFileName,
       Body: file,
-      ContentType: mime.lookup(path)
+      ContentType: photoMimeType
     };
 
     s3.upload(params, function (err, data) {
@@ -35,23 +36,22 @@ chokidar.watch(config.photos_dir, options).on("add", function (path) {
       console.log(data.Location);
     });
 
-    sharp(file)
+    gm(file)
       .resize(639, 392)
-      .max()
-      .png()
-      .toBuffer()
-      .then(function(data) {
-        var params = {
-          Key: "thumbnails/" + fileName,
-          Body: data,
-          ContentType: "image/png"
-        };
+      .toBuffer(function(err, data) {
+        if(!err){
+          var params = {
+            Key: "thumbnails/" + fileName,
+            Body: data,
+            ContentType: photoMimeType
+          };
 
-        s3.upload(params, function (err, data) {
-          if(err) throw err;
+          s3.upload(params, function (err, data) {
+            if(err) throw err;
 
-          console.log(data.Location);
-        });
+            console.log(data.Location);
+          });
+        }
       });
   });
 

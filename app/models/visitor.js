@@ -73,7 +73,7 @@ VisitorSchema.statics.assignGroup = function() {
           unassignedVisitors.forEach(function(visitor) {
 
             Visitor.update({_id: visitor._id}, {groupId: id}, function (err, n) {
-              if(err) throw deferred.reject(err);
+              if(err) deferred.reject(err);
               console.log("Updated docs: ", n);
             });
 
@@ -107,7 +107,7 @@ VisitorSchema.plugin(timestamps);
 var Visitor = mongoose.model('Visitor', VisitorSchema);
 
 Sequence.find({_id: 'visitor.id'}, function (err, results) {
-  if(err) throw err;
+  if(err) console.log(err);
   if(results.length == 0) Sequence.create({_id: 'visitor.id', seq: 0});
 })
 

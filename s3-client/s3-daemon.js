@@ -9,10 +9,6 @@ AWS.config.region = "sa-east-1";
 
 var s3 = new AWS.S3({params: {Bucket: "turismo-site"} });
 
-var options = {
-  persistent: true
-};
-
 watch(config.photos_dir, function (path) {
 
   try {
@@ -41,7 +37,7 @@ watch(config.photos_dir, function (path) {
     s3.upload(params, function (err, data) {
       if(err) throw err;
 
-      console.log(data.Location);
+      console.log("Uploaded: ", data.Location);
     });
 
     gm(file)
@@ -57,7 +53,7 @@ watch(config.photos_dir, function (path) {
           s3.upload(params, function (err, data) {
             if(err) throw err;
 
-            console.log(data.Location);
+            console.log("Uploaded: ", data.Location);
           });
         }
       });

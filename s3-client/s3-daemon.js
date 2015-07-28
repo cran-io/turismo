@@ -1,5 +1,5 @@
 var fs = require('fs');
-var chokidar = require('chokidar');
+var watch = require('node-watch');
 var config = require('../app/utils').config();
 var AWS = require('aws-sdk');
 var mime = require('mime');
@@ -13,7 +13,15 @@ var options = {
   persistent: true
 };
 
-chokidar.watch(config.photos_dir, options).on("add", function (path) {
+watch(config.photos_dir, function (path) {
+
+  try {
+    var pathStat = fs.statSync(path);
+    if(pathStat.isDirectory()) return;
+  } catch (e) {
+    return;
+  }
+
 
   var pathArray = path.split("/");
   var fileName = pathArray[pathArray.length-1];

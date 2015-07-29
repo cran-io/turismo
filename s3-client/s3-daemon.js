@@ -8,22 +8,25 @@ var walk = require('walk');
 
 AWS.config.region = "sa-east-1";
 
-var s3 = new AWS.S3({params: {Bucket: "turismo-site"} });
+var s3 = new AWS.S3({params: {Bucket: config.S3.bucket} });
 var walker = walk.walk(config.photos_dir, { followLinks: false });
 
 var separator = process.platform === "win32" ? "\\" : "/";
 
 walker.on("file", function (root, fileStat, next) {
   var path = [root, fileStat.name].join(separator);
-  uploadPhotos(path);
-  next();
+  uploadPhotos(path, function () {
+    next();
+  });
 });
 
 watch(config.photos_dir, function (path) {
-  uploadPhotos(path);
+  uploadPhotos(path, function () {
+    console.log("Sync Done!");
+  });
 });
 
-function uploadPhotos(path) {
+function uploadPhotos(path, done) {
   try {
     var pathStat = fs.statSync(path);
     if(pathStat.isDirectory()) return;
@@ -50,26 +53,26 @@ function uploadPhotos(path) {
 
     s3.upload(params, function (err, data) {
       if(err) throw err;
-
       console.log("Uploaded: ", data.Location);
+
+      gm(file)
+        .resize(639, 392)
+        .toBuffer(function(err, data) {
+          if(!err){
+            var params = {
+              Key: "thumbnails/" + fileName,
+              Body: data,
+              ContentType: photoMimeType
+            };
+
+            s3.upload(params, function (err, data) {
+              if(err) throw err;
+
+              console.log("Uploaded: ", data.Location);
+              done();
+            });
+          }
+        });
     });
-
-    gm(file)
-      .resize(639, 392)
-      .toBuffer(function(err, data) {
-        if(!err){
-          var params = {
-            Key: "thumbnails/" + fileName,
-            Body: data,
-            ContentType: photoMimeType
-          };
-
-          s3.upload(params, function (err, data) {
-            if(err) throw err;
-
-            console.log("Uploaded: ", data.Location);
-          });
-        }
-      });
   });
 }

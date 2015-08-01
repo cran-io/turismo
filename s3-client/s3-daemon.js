@@ -12,24 +12,17 @@ AWS.config.region = "sa-east-1";
 AWS.config.maxRetries = 5;
 
 var s3 = new AWS.S3({params: {Bucket: config.S3.bucket} });
-var walker = walk.walk(config.photos_dir, { followLinks: false });
+var walker = walk.walk("C:\\Users\\Usuario\\Desktop\\sensorium-photos", { followLinks: false });
 
 var separator = process.platform === "win32" ? "\\" : "/";
 
-walker.on("file", function (root, fileStat, next) {
-  var path = [root, fileStat.name].join(separator);
-
-  uploadPhotos(path).then(function () {
-    next();
-  });
-});
-
+console.log("Watching %s for changes", config.photos_dir);
 watch(config.photos_dir, function (path) {
   uploadPhotos(path).then(function () {
     console.log("Sync Done!");
   })
   .catch(function (error) {
-    console.log("File deleted");
+    console.log("File deleted.- Error: " + error);
   });
 });
 

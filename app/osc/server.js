@@ -34,25 +34,25 @@ module.exports = function(port) {
   });
 
   oscServer.on("/videoMappingDone", function(msg, rinfo) {
-    // Visitor.assignGroup()
-    //   .then(function(id) {
-    //     groupId = id;
-    //     mapping.findAllEquipment()
-    //       .then(function (installations) {
-    //         var filteredInstallations = rejectRegistrationTotems(installations);
-    //
-    //         filteredInstallations.forEach(function (installation) {
-    //           var ipPortArray = anInstallation.split(":");
-    //           var client = new osc.Client(ipPortArray[0], parseInt(ipPortArray[1]));
-    //           client.send('/wakeUp', id, function() {
-    //             client.kill();
-    //           });
-    //         });
-    //       });
-    //   })
-    //   .catch(function (error) {
-    //     console.log(error);
-    //   });
+    Visitor.assignGroup()
+      .then(function(id) {
+        groupId = id;
+        mapping.findAllEquipment()
+          .then(function (installations) {
+            // var filteredInstallations = rejectRegistrationTotems(installations);
+            //
+            // filteredInstallations.forEach(function (installation) {
+            //   var ipPortArray = anInstallation.split(":");
+            //   var client = new osc.Client(ipPortArray[0], parseInt(ipPortArray[1]));
+            //   client.send('/wakeUp', id, function() {
+            //     client.kill();
+            //   });
+            // });
+          });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   });
 
   oscServer.on("/videoClosureStarted", function (msg, rinfo) {
@@ -80,9 +80,3 @@ module.exports = function(port) {
 
   console.log("OSC Server listening at port " + port);
 };
-
-function rejectRegistrationTotems(installations) {
-  return _.reject(installations, function (equipment) {
-    return equipment.isTotem == "true";
-  });
-}

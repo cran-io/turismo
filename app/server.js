@@ -15,7 +15,7 @@ require('./routes')(app);
 require('./osc/server')(config.osc.port);
 // Schedule taskg
 // require('./scheduled-tasks/statistics-email-task').schedule();
-require('./scheduled-tasks/visitors-email-task').testEmail();
+require('./scheduled-tasks/visitors-email-task').schedule();
 /*
 * Middleware
 */

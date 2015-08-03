@@ -22,72 +22,25 @@ var fakeRecipient = [
 exports.schedule = function () {
   var job = new CronJob("40 11 18 * * *", function () {
     console.log("Visitors email task started");
-      var query = {
-        $or: [
-          { emailSent: false },
-          { emailSent: { $exists: false} }]
-      };
-      Visitor.find(query).sort({_id:-1}).limit(10).exec(function (err, result) {
-        console.log("Total emails to be sent: ", result.length);
+    var query = {
+      $or: [
+        { emailSent: false },
+        { emailSent: { $exists: false} }]
+    };
+    Visitor.find(query).sort({_id:-1}).limit(10).exec(function (err, result) {
+      console.log("Total emails to be sent: ", result.length);
 
-        result.forEach(function (visitor) {
-          console.log(visitor._id);
-          var groupId = visitor.groupId || "0";
-          var visitorPhotosPath = [groupId, visitor._id].join("/");
-          fs.readdir(path.join(PHOTOS_PATH, visitorPhotosPath), function (err, photos) {
-            if(photos){
-              var cromaPhotos = _.select(photos, function (elem) {
-                return _.startsWith(elem, "croma_");
-              }).map(filesUrl());
-
-              var expertosPhotos = _.select(photos, function (elem) {
-                return _.startsWith(elem, "experto_");
-              }).map(filesUrl());
-
-              var recipient = {
-                email: visitor.email,
-                name: visitor.name,
-                type: "to"
-              };
-
-              var message = {
-                "to": fakeRecipient,
-                "global_merge_vars": [{
-                    name: "croma",
-                    content: cromaPhotos
-                  },
-                  {
-                    name: "valijas",
-                    content: expertosPhotos
-                  }],
-                "merge_language": "handlebars"
-              };
-
-              var utcTime = moment().utc();
-
-              var opts = {
-                "template_name": "turismo-ruta-40",
-                "template_content": [],
-                "message": message
-              };
-
-              mandrillClient.messages.sendTemplate(opts, function(result) {
-                console.log(result);
-              }, function(error) {
-                console.log(error);
-              });
-
-            }
-          });
-        });
+      result.forEach(function (visitor) {
+        console.log(visitor._id);
+        sendEmailToVisitor(visitor);
+      });
     });
-
   });
 
   job.start();
 }
 
-exports.testEmail = function() {
+exports.testEmail = function () {
   var visitor = new Visitor({
     _id: 0,
     groupId: 0,
@@ -99,6 +52,21 @@ exports.testEmail = function() {
   });
 
   sendEmailToVisitor(visitor);
+}
+
+exports.scheduleOnce = function (groupId) {
+  console.log("schedule once");
+  var date = moment().add(15, 'minutes');
+  var job = new CronJob(date._d, function() {
+    console.log("Sending emails to group ", groupId);
+    var query = { groupId: groupId };
+    Visitor.find(query).exec(function (err, result) {
+      result.map(function (visitor) {
+        sendEmailToVisitor(visitor);
+      });
+    });
+  }, function() {
+  }, true, 'America/Argentina/Buenos_Aires');
 }
 
 function sendEmailToVisitor(visitor) {

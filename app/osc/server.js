@@ -1,4 +1,4 @@
-  var osc = require('node-osc');
+var osc = require('node-osc');
 var Group = require('../models/group');
 var Visitor = require('../models/visitor');
 var utils = require('../utils');
@@ -7,6 +7,8 @@ var path = require('path');
 
 var InstallationMapping = require(path.join(__dirname, '../../', 'config/installation-mapping'));
 var mapping = new InstallationMapping(path.join(__dirname, '../../', 'config/reader-installation-mapping.xml'));
+
+var scheduleOnce = require('visitors-email-task').scheduleOnce;
 
 var groupId;
 
@@ -37,6 +39,7 @@ module.exports = function(port) {
     Visitor.assignGroup()
       .then(function(id) {
         groupId = id;
+        scheduleOnce(groupId);
         mapping.findAllEquipment()
           .then(function (installations) {
             // var filteredInstallations = rejectRegistrationTotems(installations);

@@ -8,7 +8,7 @@ var path = require('path');
 var InstallationMapping = require(path.join(__dirname, '../../', 'config/installation-mapping'));
 var mapping = new InstallationMapping(path.join(__dirname, '../../', 'config/reader-installation-mapping.xml'));
 
-var scheduleOnce = require('visitors-email-task').scheduleOnce;
+var scheduleOnce = require('../scheduled-tasks/visitors-email-task').scheduleOnce;
 
 var groupId;
 

@@ -90,7 +90,7 @@ function sendEmailToVisitor(visitor) {
       };
 
       var message = {
-        "to": fakeRecipient,
+        "to": recipient,
         "global_merge_vars": [{
             name: "croma",
             content: cromaPhotos

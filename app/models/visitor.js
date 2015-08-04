@@ -5,6 +5,7 @@ var Group = require('./group');
 var Q = require('q');
 var Schema = mongoose.Schema;
 var timestamps = require('mongoose-timestamp');
+var _ = require('underscore');
 
 var VisitorSchema = new Schema({
   _id: Number,
@@ -30,6 +31,7 @@ var VisitorSchema = new Schema({
     required: true
   },
   emailSent: {
+    type: Boolean,
     default: false
   }
 });
@@ -94,12 +96,16 @@ VisitorSchema.statics.assignGroup = function() {
 */
 VisitorSchema.pre('save', function(next){
   var thisDoc = this;
-  Sequence.findByIdAndUpdate({_id: 'visitor.id'}, {$inc: { seq: 1} }, function(error, sequence)   {
-    if(error) return next(error);
-
-    thisDoc._id = sequence.seq;
+  if (!_.isUndefined(thisDoc._id)) {
     next();
-  });
+  } else {
+    Sequence.findByIdAndUpdate({_id: 'visitor.id'}, {$inc: { seq: 1} }, function(error, sequence)   {
+      if(error) return next(error);
+
+      thisDoc._id = sequence.seq;
+      next();
+    });
+  }
 });
 
 VisitorSchema.plugin(timestamps);

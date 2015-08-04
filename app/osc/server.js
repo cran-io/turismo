@@ -1,4 +1,4 @@
-  var osc = require('node-osc');
+var osc = require('node-osc');
 var Group = require('../models/group');
 var Visitor = require('../models/visitor');
 var utils = require('../utils');

@@ -10,7 +10,8 @@ var mapping = new InstallationMapping(path.join(__dirname, '../../', 'config/rea
 
 var scheduleOnce = require('../scheduled-tasks/visitors-email-task').scheduleOnce;
 
-var groupId;
+var groupIdPlayground;
+var groupIdDome;
 
 module.exports = function(port) {
   var oscServer = new osc.Server(port, '0.0.0.0');
@@ -21,37 +22,11 @@ module.exports = function(port) {
     console.log(rinfo)
   });
 
-  oscServer.on("/videoDomeDone", function(msg, rinfo) {
-    // Group.find()
-    //   .sort({
-    //     _id: -1
-    //   })
-    //   .limit(1)
-    //   .exec(function(err, result) {
-    //     if (err) return next(err);
-    //     var lastGroup = result[0];
-    //
-    //     mailer.sendPhotos(lastGroup);
-    //   });
-  });
-
   oscServer.on("/videoMappingDone", function(msg, rinfo) {
     Visitor.assignGroup()
       .then(function(id) {
-        groupId = id;
+        groupIdPlayground = id;
         scheduleOnce(groupId);
-        mapping.findAllEquipment()
-          .then(function (installations) {
-            // var filteredInstallations = rejectRegistrationTotems(installations);
-            //
-            // filteredInstallations.forEach(function (installation) {
-            //   var ipPortArray = anInstallation.split(":");
-            //   var client = new osc.Client(ipPortArray[0], parseInt(ipPortArray[1]));
-            //   client.send('/wakeUp', id, function() {
-            //     client.kill();
-            //   });
-            // });
-          });
       })
       .catch(function (error) {
         console.log(error);
@@ -59,26 +34,16 @@ module.exports = function(port) {
   });
 
   oscServer.on("/videoClosureStarted", function (msg, rinfo) {
-    // mapping.findAllEquipment()
-    //   .then(function (installations) {
-    //     var filteredInstallations = rejectRegistrationTotems(installations);
-    //
-    //     filteredInstallations.forEach(function (installation) {
-    //       var ipPortArray = anInstallation.split(":");
-    //       var client = new osc.Client(ipPortArray[0], parseInt(ipPortArray[1]));
-    //       client.send('/sleep', id, function() {
-    //         client.kill();
-    //       });
-    //     });
-    //   });
+    groupIdDome = groupIdPlayground;
+    groupIdPlayground = 0;
   });
 
 
   oscServer.on("/videoDomeStarted", function (msg, rinfo) {
-    // var client = new osc.Client(rinfo.address, 12000);
-    // client.send('/domeStarted', groupId, function() {
-    //   client.kill();
-    // });
+    var client = new osc.Client(rinfo.address, 12000);
+    client.send('/domeStarted', groupIdDome, function() {
+      client.kill();
+    });
   })
 
   console.log("OSC Server listening at port " + port);

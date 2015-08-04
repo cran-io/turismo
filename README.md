@@ -53,3 +53,9 @@ Invocado para subir las fotos tomadas por las tablets.
 #### Returns:
 - **HTTP 200**, si no hubo error.
 - **HTTP 500**, si hay error.
+
+## Statistics
+
+```
+db.visitors.aggregate([{"$group": {_id: {y: {"$year":"$createdAt"}, m: {"$month":"$createdAt"}, d: {"$dayOfMonth":"$createdAt"}}, count: {$sum:1}}}, { $sort: {_id: 1}}]);
+```

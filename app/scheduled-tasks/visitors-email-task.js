@@ -55,7 +55,7 @@ exports.scheduleOnce = function (groupId) {
 function findVisitorsForMailing() {
   console.log("Visitors email task started");
   var query = {
-    createdAt: { $gte: new Date('2015-07-29T00:00:00.000Z') },
+    createdAt: { $gte: new Date('2015-08-05T00:00:00.000Z') },
     $or: [
       { emailSent: false },
       { emailSent: { $exists: false} }]

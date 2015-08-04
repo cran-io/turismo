@@ -39,7 +39,7 @@ exports.testEmail = function () {
 }
 
 exports.scheduleOnce = function (groupId) {
-  var date = moment().add(15, 'minutes');
+  var date = moment().add(45, 'minutes');
   var job = new CronJob(date._d, function() {
     console.log("Sending emails to group ", groupId);
     var query = { groupId: groupId };

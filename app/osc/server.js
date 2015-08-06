@@ -26,7 +26,7 @@ module.exports = function(port) {
     Visitor.assignGroup()
       .then(function(id) {
         groupIdPlayground = id;
-        scheduleOnce(groupId);
+        scheduleOnce(groupIdPlayground);
       })
       .catch(function (error) {
         console.log(error);

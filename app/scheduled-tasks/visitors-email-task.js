@@ -83,11 +83,11 @@ function sendEmailToVisitor(visitor) {
         return _.startsWith(elem, "experto_");
       }).map(filesUrl());
 
-      var recipient = {
+      var recipient = [{
         email: visitor.email,
         name: visitor.name,
         type: "to"
-      };
+      }];
 
       var message = {
         "to": recipient,

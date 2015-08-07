@@ -24,30 +24,10 @@ exports.schedule = function () {
   job.start();
 }
 
-exports.testEmail = function () {
-  var visitor = new Visitor({
-    _id: 0,
-    groupId: 0,
-    name: "TEST1",
-    email: "test1@test.com",
-    age: 18,
-    preferenceRegion: 0,
-    qrCode: "123"
-  });
-
-  sendEmailToVisitor(visitor);
-}
-
 exports.scheduleOnce = function (groupId) {
   var date = moment().add(45, 'minutes');
   var job = new CronJob(date._d, function() {
-    console.log("Sending emails to group ", groupId);
-    var query = { groupId: groupId };
-    Visitor.find(query).exec(function (err, result) {
-      result.map(function (visitor) {
-        sendEmailToVisitor(visitor);
-      });
-    });
+    sendEmailToGroup(groupId);
   }, function() {
   }, true, 'America/Argentina/Buenos_Aires');
 }
@@ -55,22 +35,51 @@ exports.scheduleOnce = function (groupId) {
 function findVisitorsForMailing() {
   console.log("Visitors email task started");
   var query = {
-    createdAt: { $gte: new Date('2015-08-05T00:00:00.000Z') },
-    $or: [
-      { emailSent: false },
-      { emailSent: { $exists: false} }]
+    createdAt: { $gte: new Date('2015-08-05T00:00:00.000Z') }
   };
-  Visitor.find(query).exec(function (err, result) {
+  Group.find(query).exec(function (err, result) {
     console.log(result);
     console.log("Total emails to be sent: ", result.length);
 
-    result.forEach(function (visitor) {
-      sendEmailToVisitor(visitor);
+    result.forEach(function (group) {
+      sendEmailToGroup(group._id);
     });
   });
 }
 
-function sendEmailToVisitor(visitor) {
+function sendEmailToGroup(groupId) {
+  var domePath = [groupId, "dome"].join("/");
+  var groupPath = path.join(PHOTOS_PATH, domePath);
+  fs.readdir(groupPath, function (err, photos) {
+    var domoPhotos = [];
+    if (photos) {
+      domoPhotos = _.select(photos, function (elem) {
+        return _.startsWith(elem, "domo_");
+      }).map(filesUrl());
+    }
+
+    var query = {
+      createdAt: { $gte: new Date('2015-08-05T00:00:00.000Z') },
+      $or: [
+        { emailSent: false },
+        { emailSent: { $exists: false} }],
+      groupId: groupId
+    };
+
+    console.log(query);
+
+    Visitor.find(query).exec(function (err, result) {
+      console.log(result);
+      console.log("Total emails to be sent: ", result.length);
+
+      result.forEach(function (visitor) {
+        sendEmailToVisitor(visitor, domoPhotos);
+      });
+    });
+  });
+}
+
+function sendEmailToVisitor(visitor, domoPhotos) {
   var groupId = visitor.groupId || "0";
   var visitorPhotosPath = [groupId, visitor._id].join("/");
   fs.readdir(path.join(PHOTOS_PATH, visitorPhotosPath), function (err, photos) {
@@ -92,6 +101,10 @@ function sendEmailToVisitor(visitor) {
       var message = {
         "to": recipient,
         "global_merge_vars": [{
+            name: "domo",
+            content: domoPhotos
+          },
+          {
             name: "croma",
             content: cromaPhotos
           },
@@ -105,9 +118,10 @@ function sendEmailToVisitor(visitor) {
       var utcTime = moment().utc();
 
       var opts = {
-        "template_name": "turismo-ruta-40",
+        "template_name": "sensorium-test",
         "template_content": [],
-        "message": message
+        "message": message,
+        "publish": false
       };
 
       mandrillClient.messages.sendTemplate(opts, function(result) {

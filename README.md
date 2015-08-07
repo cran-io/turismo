@@ -48,7 +48,18 @@ Invocado en el momento que las personas salen del domo.
 ### POST /image/upload
 Invocado para subir las fotos tomadas por las tablets.
 
-#### No params
+#### Params: (MultiPart)
+- **picture**, la foto a subir. Va a ser renombrada a filename_date.ext
+
+#### Returns:
+- **HTTP 200**, si no hubo error.
+- **HTTP 500**, si hay error.
+
+### POST /dome/upload
+Invocado para subir las fotos tomadas por las tablets.
+
+#### Params: (MultiPart)
+- **dome_image**, la foto del domo a subir. Mantiene su nombre original.
 
 #### Returns:
 - **HTTP 200**, si no hubo error.

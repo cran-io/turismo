@@ -4,9 +4,15 @@ var path = require('path');
 var multer = require('multer');
 var mkdirp = require('mkdirp');
 
-var staticStorage = multer.diskStorage({
+var dynamicStorage = multer.diskStorage({
   destination: function(req, file, cb) {
-    var finalPath = path.join(config.photos_dir, '/uploads');
+    var match = file.originalname.split('_');
+    if (match.length < 3) {
+      return cb("Error! Wrong file name.");
+    }
+
+    var groupId = match[1];
+    var finalPath = path.join(config.photos_dir, '/' + groupId);
 
     mkdirp(finalPath, function(err) {
       if (err) {
@@ -17,21 +23,21 @@ var staticStorage = multer.diskStorage({
     });
   },
   filename: function(req, file, cb) {
-    var i = file.originalname.lastIndexOf('.');
-    var name = file.originalname.substr(0, i);
-    var ext = (i < 0) ? '.png' : file.originalname.substr(i - 1);
-    cb(null, name + "_" + Date.now() + ext);
+    cb(null, file.originalname);
   }
 });
 
 var upload = multer({
-  storage: staticStorage
+  storage: dynamicStorage
 });
 
 module.exports = function(app) {
   var router = express.Router();
-  router.post('/upload', upload.single('picture'), function(req, res) {
+
+  router.post('/upload', upload.single('dome_image'), function(req, res) {
+    console.log('Form files: ' + req.files);
     res.status(200).end();
   });
-  app.use("/image", router);
+
+  app.use("/dome", router);
 };

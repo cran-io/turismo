@@ -12,7 +12,7 @@ var dynamicStorage = multer.diskStorage({
     }
 
     var groupId = match[1];
-    var finalPath = path.join(config.photos_dir, '/' + groupId);
+    var finalPath = path.join(config.photos_dir, '/' + groupId + '/dome');
 
     mkdirp(finalPath, function(err) {
       if (err) {

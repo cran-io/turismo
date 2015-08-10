@@ -118,7 +118,7 @@ function sendEmailToVisitor(visitor, domoPhotos) {
       var utcTime = moment().utc();
 
       var opts = {
-        "template_name": "sensorium-test",
+        "template_name": "turismo-ruta-40",
         "template_content": [],
         "message": message,
         "publish": false

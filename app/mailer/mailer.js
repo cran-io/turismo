@@ -78,24 +78,30 @@ var sendPhotos = function(group) {
   return deferred.promise;
 };
 
-exports.sendStatistics = function(statistics) {
-  console.log(statistics);
-  mandrillClient.messages.sendTemplate({
-    "template_name": "sensorium-statistics",
-    "template_content": [],
+exports.sendStatistics = function(text) {
+  console.log(text);
+  mandrillClient.messages.send({
     "message": {
+      "text": text,
+      "from_name": "Sensorium",
+      "from_email": "info@sensorium.tecnopolis.argentina.tur.ar",
+      "subject": "Estadísticas Sensorium",
       "to": [{
-        "email": "mmaquiel@cran.io",
-        "name": "matias",
+        "email": "miguel@cran.io",
+        "name": "Miguel",
         "type": "to"
-      }],
-      "global_merge_vars": [{
-        name: "totalVisits",
-        value: statistics.totalVisits
-      },
-      {
-        name: "lastDayVisits",
-        value: statistics. lastDayVisits
+      },{
+        "email": "martin@masotros.com",
+        "name": "Martín",
+        "type": "to"
+      },{
+        "email": "nahuel@masotros.com",
+        "name": "Nahuel",
+        "type": "to"
+      },{
+        "email": "alan@masotros.com",
+        "name": "Alan",
+        "type": "to"
       }]
     }
   }, function(result) {

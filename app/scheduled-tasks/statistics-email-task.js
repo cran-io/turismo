@@ -7,6 +7,7 @@ exports.schedule = function () {
   var job = new CronJob("00 10 21 * * *", sendStatisticsMail);
   job.start();
   console.log("Statistics email scheduled");
+  sendStatisticsMail();
 }
 
 function sendStatisticsMail() {
@@ -21,7 +22,7 @@ function sendStatisticsMail() {
       },
       count: { $sum:1 } }
     },{
-      $sort: { createdAt: 1 }
+      $sort: { _id: 1 }
     }];
 
   Visitor.aggregate(aggregate, function(err, result) {

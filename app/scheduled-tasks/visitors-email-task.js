@@ -1,5 +1,6 @@
 var CronJob = require('cron').CronJob;
 var Visitor = require('../models/visitor');
+var Group = require('../models/group');
 var fs = require('fs');
 var path = require('path');
 var config = require('../utils').config();

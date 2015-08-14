@@ -20,6 +20,8 @@ var VisitorSchema = new Schema({
   },
   email: {
     type: String,
+    trim: true,
+    lowercase: true,
     validate: [ validator.isEmail, 'Invalid Email' ]
   },
   preferenceRegion: {

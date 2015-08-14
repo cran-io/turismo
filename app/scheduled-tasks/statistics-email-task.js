@@ -33,9 +33,9 @@ function sendStatisticsMail() {
   });
 }
 
-function formatMailText(statistics) {
-  return statistics.map(function(statistic) {
-    var day = statistic._id
-    return "Día " + day.d + "/" + day.m + "/" + day.y + " Visitantes: " + statistic.count + '\n'
+function formatMailText(data) {
+  return data.map(function(data) {
+    var day = data._id
+    return "Día " + day.d + "/" + day.m + "/" + day.y + " Visitantes: " + data.count + '\n'
   })
 }

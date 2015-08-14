@@ -7,7 +7,7 @@ var InstallationMapping = require(path.join(__dirname, '../../', 'config/install
 
 // Models
 var Visitor = require('../models/visitor');
-var Statistic = require('../models/Statistic')
+var Statistic = require('../models/statistic')
 
 var MAPPING_FILE_DIR = path.join(__dirname, '../../', 'config/reader-installation-mapping.xml');
 

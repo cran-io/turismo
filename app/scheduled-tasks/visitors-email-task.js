@@ -84,47 +84,53 @@ function sendEmailToVisitor(visitor, domoPhotos) {
   var groupId = visitor.groupId || "0";
   var visitorPhotosPath = [groupId, visitor._id].join("/");
   fs.readdir(path.join(PHOTOS_PATH, visitorPhotosPath), function (err, photos) {
-    if(photos){
-      var cromaPhotos = _.select(photos, function (elem) {
+
+    var cromaPhotos = [];
+    var expertosPhotos = [];
+
+    if(photos) {
+      cromaPhotos = _.select(photos, function (elem) {
         return _.startsWith(elem, "croma_");
       }).map(filesUrl());
 
-      var expertosPhotos = _.select(photos, function (elem) {
+      expertosPhotos = _.select(photos, function (elem) {
         return _.startsWith(elem, "experto_");
       }).map(filesUrl());
+    }
 
-      var recipient = [{
-        email: visitor.email,
-        name: visitor.name,
-        type: "to"
-      }];
+    var recipient = [{
+      email: visitor.email,
+      name: visitor.name,
+      type: "to"
+    }];
 
-      var message = {
-        "to": recipient,
-        "global_merge_vars": [{
-            name: "domo",
-            content: domoPhotos
-          },
-          {
-            name: "croma",
-            content: cromaPhotos
-          },
-          {
-            name: "valijas",
-            content: expertosPhotos
-          }],
-        "merge_language": "handlebars"
-      };
+    var message = {
+      "to": recipient,
+      "global_merge_vars": [{
+          name: "domo",
+          content: domoPhotos
+        },
+        {
+          name: "croma",
+          content: cromaPhotos
+        },
+        {
+          name: "valijas",
+          content: expertosPhotos
+        }],
+      "merge_language": "handlebars"
+    };
 
-      var utcTime = moment().utc();
+    var utcTime = moment().utc();
 
-      var opts = {
-        "template_name": "turismo-ruta-40",
-        "template_content": [],
-        "message": message,
-        "publish": false
-      };
+    var opts = {
+      "template_name": "turismo-ruta-40",
+      "template_content": [],
+      "message": message,
+      "publish": false
+    };
 
+    if (domoPhotos.length > 0 || cromaPhotos.length > 0 || expertosPhotos.length > 0) {
       mandrillClient.messages.sendTemplate(opts, function(result) {
         visitor.emailSent = true;
         visitor.save(function(err, visitor) {
@@ -134,7 +140,6 @@ function sendEmailToVisitor(visitor, domoPhotos) {
       }, function(error) {
         console.log(error);
       });
-
     }
   });
 }

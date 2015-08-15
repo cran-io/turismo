@@ -7,7 +7,6 @@ var InstallationMapping = require(path.join(__dirname, '../../', 'config/install
 
 // Models
 var Visitor = require('../models/visitor');
-var Statistic = require('../models/statistic')
 
 var MAPPING_FILE_DIR = path.join(__dirname, '../../', 'config/reader-installation-mapping.xml');
 
@@ -49,10 +48,6 @@ module.exports = function(app) {
     console.log("Checkin received from: ", checkin.qrReaderId);
     console.log("QRCode: ", checkin.qrCode);
 
-    if (!checkin.qrReaderId || !checkin.qrCode) {
-      return res.status(422).send("Missing params");
-    }
-
     installationMapping.findByReaderIP(checkin.qrReaderId)
       .then(function (installation) {
         var client = new osc.Client(installation.ip, installation.port);
@@ -67,7 +62,7 @@ module.exports = function(app) {
         } else {
           Visitor.findByQrCode(checkin.qrCode)
             .then(function(visitor) {
-              if (!visitor) return res.status(404).send('Visitor not found');
+              if (!visitor) res.status(404).send('Visitor not found');
 
               var groupId = visitor.groupId || 0;
               var readerId = parseInt(checkin.qrReaderId.split(".")[3])%10;
@@ -76,12 +71,8 @@ module.exports = function(app) {
               client.send('/QRTag', readerId, visitor._id, groupId,
                 visitor.name, visitor.email, visitor.age, visitor.preferenceRegion,
                 function() {
-                  var statistic = new Statistic({
-                    installation: installation.name,
-                    visitor: visitor._id
-                  })
-                  statistic.save();
-                  client.kill();
+
+                client.kill();
               });
             });
         }

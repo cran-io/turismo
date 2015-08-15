@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/cran-io/turismo#readme",
   "dependencies": {
-    "async": "^1.4.2",
+    "async": "^1.4.0",
     "aws-sdk": "^2.1.40",
     "body-parser": "^1.13.1",
     "cron": "^1.0.9",

@@ -1,54 +1,18 @@
 var CronJob = require('cron').CronJob;
 var mailer = require('../mailer/mailer');
 var moment = require('moment');
-var async = require('async');
-var _ = require('underscore');
-
-// MODELS
 var Visitor = require('../models/visitor');
-var Statistic = require('../models/statistic')
 
 exports.schedule = function () {
-  // var job = new CronJob("00 10 21 * * *", sendStatisticsMail);
-  // job.start();
-  // console.log("Statistics email scheduled");
-  sendStatisticsMail();
+  var job = new CronJob("00 10 21 * * *", sendStatisticsMail);
+  job.start();
+  console.log("Statistics email scheduled");
 }
 
 function sendStatisticsMail() {
   console.log("Statistics email task started");
 
-  async.parallel([function(cb) {
-    Visitor.aggregate(visitorAggregate(), function(err, result) {
-      if (err) cb(err, null);
-      else {
-        var text = formatMailText(result).join("");
-        mailer.sendStatistics(text);
-        cb(null, result);
-      }
-    });
-  }, function(cb) {
-    Statistic.aggregate(statisticAggregate(), function(err, result) {
-      if (err) cb(err, null);
-      else cb(null, result);
-    });
-  }], function(err, result) {
-    console.log("Error: ", err);
-    console.log("Result: ", result);
-    var visitors = result[0];
-    var statistics = result[1];
-  });
-}
-
-function formatMailText(data) {
-  return data.map(function(data) {
-    var day = data._id
-    return "Día " + day.d + "/" + day.m + "/" + day.y + " Visitantes: " + data.count + '\n'
-  })
-}
-
-function visitorAggregate() {
-  return [{
+  var aggregate = [{
     $group : {
       _id: {
         y: { "$year": "$createdAt" },
@@ -58,20 +22,20 @@ function visitorAggregate() {
       count: { $sum:1 } }
     },{
       $sort: { _id: 1 }
-  }];
+    }];
+
+  Visitor.aggregate(aggregate, function(err, result) {
+    if (err) console.log("Error: ", err);
+    else {
+      var text = formatMailText(result).join("");
+      mailer.sendStatistics(text);
+    };
+  });
 }
 
-function statisticAggregate() {
-  return [{
-    $group : {
-      _id: {
-        name: "$installation",
-        day: {
-          y: { "$year": "$createdAt" },
-          m: { "$month": "$createdAt" },
-          d: { "$dayOfMonth": "$createdAt" }
-        }
-      },
-      count: { $sum:1 } }
-  }];
+function formatMailText(statistics) {
+  return statistics.map(function(statistic) {
+    var day = statistic._id
+    return "Día " + day.d + "/" + day.m + "/" + day.y + " Visitantes: " + statistic.count + '\n'
+  })
 }

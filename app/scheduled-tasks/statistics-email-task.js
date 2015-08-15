@@ -9,10 +9,9 @@ var Visitor = require('../models/visitor');
 var Statistic = require('../models/statistic')
 
 exports.schedule = function () {
-  // var job = new CronJob("00 10 21 * * *", sendStatisticsMail);
-  // job.start();
-  // console.log("Statistics email scheduled");
-  sendStatisticsMail();
+  var job = new CronJob("00 10 21 * * *", sendStatisticsMail);
+  job.start();
+  console.log("Statistics email scheduled");
 }
 
 function sendStatisticsMail() {

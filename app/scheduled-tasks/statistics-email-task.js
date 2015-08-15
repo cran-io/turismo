@@ -21,9 +21,11 @@ function sendStatisticsMail() {
   async.parallel([function(cb) {
     Visitor.aggregate(visitorAggregate(), function(err, result) {
       if (err) cb(err, null);
-      else cb(null, result);
-        // var text = formatMailText(result).join("");
-        // mailer.sendStatistics(text);
+      else {
+        var text = formatMailText(result).join("");
+        mailer.sendStatistics(text);
+        cb(null, result);
+      }
     });
   }, function(cb) {
     Statistic.aggregate(statisticAggregate(), function(err, result) {
